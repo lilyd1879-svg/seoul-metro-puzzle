@@ -659,6 +659,7 @@ html_content = f"""<!DOCTYPE html>
       <div class="actions-bar">
         <button class="btn" id="btn-undo">↩ 취소</button>
         <button class="btn" id="btn-reset">초기화</button>
+        <button class="btn" id="btn-hint-side" style="border-color: rgba(56, 189, 248, 0.45); color: #7dd3fc;">💡 힌트</button>
         <button class="btn" id="btn-reveal" style="border-color: rgba(250, 204, 21, 0.45); color: #fde047;">👁️ 정답 보기</button>
         <button class="btn btn-primary" id="btn-check">정답 확인</button>
       </div>
@@ -746,6 +747,7 @@ html_content = f"""<!DOCTYPE html>
     let currentStageIndex = 0;
     let currentStage = null;
     let userPath = [];
+    let hintStep = 0;
     let clearedStages = new Set(JSON.parse(localStorage.getItem("seoul_metro_cleared") || "[]"));
 
     const defaultViewBox = {{ x: 100, y: 100, w: 3920, h: 3920 }};
@@ -962,6 +964,7 @@ html_content = f"""<!DOCTYPE html>
       document.getElementById("od-end-name").textContent = currentStage.end;
 
       renderClues();
+      hintStep = 0;
       updatePathUI();
       playBeep(587.33, 'sine', 0.08);
     }}
@@ -1102,6 +1105,7 @@ html_content = f"""<!DOCTYPE html>
     }}
 
     function updatePathUI() {{
+      hintStep = 0;
       userPathLayer.innerHTML = '';
       const analysis = analyzeUserPath();
 
@@ -1350,17 +1354,43 @@ html_content = f"""<!DOCTYPE html>
 
     document.getElementById("btn-check").addEventListener("click", () => checkVictoryCondition(true));
 
-    // Fixed Hint Bug: uses currentStage.path
-    document.getElementById("btn-hint").addEventListener("click", () => {{
+    // 3-Stage Progressive Hint System
+    function showProgressiveHint() {{
+      if (!currentStage) return;
       const sol = currentStage.path;
+      let mismatchIdx = -1;
       for (let i = 0; i < sol.length; i++) {{
         if (userPath[i] !== sol[i]) {{
-          alert(`💡 힌트: [${{userPath[i-1] || currentStage.start}}] 다음으로 이동할 올바른 역은 [${{sol[i]}}]입니다!`);
-          return;
+          mismatchIdx = i;
+          break;
         }}
       }}
-      alert("현재까지의 경로가 완벽합니다!");
-    }});
+      if (mismatchIdx === -1) {{
+        alert("현재까지의 경로가 완벽합니다! '정답 확인'을 눌러보세요.");
+        return;
+      }}
+
+      const prevSt = sol[mismatchIdx - 1] || currentStage.start;
+      const nextSt = sol[mismatchIdx];
+      const nextLines = [...new Set(adj[prevSt].filter(e => e.neighbor === nextSt).map(e => e.line))];
+      hintStep = Math.min(3, hintStep + 1);
+
+      if (hintStep === 1) {{
+        if (mismatchIdx < userPath.length) {{
+          alert(`💡 1단계 힌트 (분기점): [${{prevSt}}] 다음 역(${{userPath[mismatchIdx]}})부터 정답 경로와 다릅니다.\n[${{prevSt}}]까지 되돌아가서 다시 선택해보세요. (다시 누르면 2단계 힌트)`);
+        }} else {{
+          alert(`💡 1단계 힌트 (다음 노선): [${{prevSt}}] 다음 구간은 [${{nextLines.join(" / ")}}] 노선을 따라 이동합니다. (다시 누르면 2단계 힌트)`);
+        }}
+      }} else if (hintStep === 2) {{
+        const nextHub = sol.slice(mismatchIdx).find(st => GAME_DATA.stations[st].lines.length > 1 && st !== currentStage.end);
+        const hubMsg = nextHub ? `앞으로 주요 환승 거점 '${{nextHub}}역'을 지납니다.` : `이후 도착역(${{currentStage.end}})까지 이어집니다.`;
+        alert(`💡 2단계 힌트 (노선·거점): 전체 이용 노선 순서는 [${{currentStage.lines.join(" ➔ ")}}]이며, ${{hubMsg}} (다시 누르면 3단계 힌트)`);
+      }} else {{
+        alert(`💡 3단계 힌트 (정답 역): [${{prevSt}}] 다음으로 이동할 올바른 역은 [${{nextSt}}]입니다!`);
+      }}
+    }}
+    document.getElementById("btn-hint").addEventListener("click", showProgressiveHint);
+    document.getElementById("btn-hint-side").addEventListener("click", showProgressiveHint);
 
     document.getElementById("btn-reveal").addEventListener("click", () => {{
       if (!currentStage) return;
