@@ -1223,23 +1223,37 @@
 
     mapArea.addEventListener("wheel", (e) => {
       e.preventDefault();
-      const zoomFactor = e.deltaY > 0 ? 1.12 : 0.88;
-      const newW = Math.max(400, Math.min(3000, viewBox.w * zoomFactor));
-      const newH = Math.max(260, Math.min(1950, viewBox.h * zoomFactor));
-      viewBox.x += (viewBox.w - newW) / 2;
-      viewBox.y += (viewBox.h - newH) / 2;
+      // Normalize deltaY for both discrete mouse wheels and continuous trackpad gestures
+      let delta = e.deltaY;
+      if (e.deltaMode === 1) delta *= 30;
+      else if (e.deltaMode === 2) delta *= 300;
+      const clampedDelta = Math.max(-80, Math.min(80, delta));
+      const zoomFactor = 1 + clampedDelta * 0.0012;
+
+      const rect = svg.getBoundingClientRect();
+      const relX = (e.clientX - rect.left) / rect.width;
+      const relY = (e.clientY - rect.top) / rect.height;
+
+      const newW = Math.max(350, Math.min(3000, viewBox.w * zoomFactor));
+      const newH = newW * (defaultViewBox.h / defaultViewBox.w);
+      viewBox.x += (viewBox.w - newW) * relX;
+      viewBox.y += (viewBox.h - newH) * relY;
       viewBox.w = newW; viewBox.h = newH;
       updateSvgViewBox();
     }, { passive: false });
 
     document.getElementById("btn-zoom-in").addEventListener("click", () => {
-      viewBox.x += viewBox.w * 0.1; viewBox.y += viewBox.h * 0.1;
-      viewBox.w *= 0.8; viewBox.h *= 0.8;
+      const newW = Math.max(350, viewBox.w * 0.9);
+      const newH = newW * (defaultViewBox.h / defaultViewBox.w);
+      viewBox.x += (viewBox.w - newW) / 2; viewBox.y += (viewBox.h - newH) / 2;
+      viewBox.w = newW; viewBox.h = newH;
       updateSvgViewBox();
     });
     document.getElementById("btn-zoom-out").addEventListener("click", () => {
-      viewBox.x -= viewBox.w * 0.1; viewBox.y -= viewBox.h * 0.1;
-      viewBox.w *= 1.2; viewBox.h *= 1.2;
+      const newW = Math.min(3000, viewBox.w * 1.1);
+      const newH = newW * (defaultViewBox.h / defaultViewBox.w);
+      viewBox.x += (viewBox.w - newW) / 2; viewBox.y += (viewBox.h - newH) / 2;
+      viewBox.w = newW; viewBox.h = newH;
       updateSvgViewBox();
     });
     document.getElementById("btn-zoom-reset").addEventListener("click", () => {
