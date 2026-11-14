@@ -677,8 +677,8 @@ html_content = f"""<!DOCTYPE html>
         <div class="legend-grid" id="legend-grid"></div>
       </div>
 
-      <!-- Full Map ViewBox (1.5x Spread Layout) -->
-      <svg id="metro-svg" viewBox="-30 100 2180 1420">
+      <!-- Full Map ViewBox (v2 Circular Line 2 + Official Layout) -->
+      <svg id="metro-svg" viewBox="-20 0 2180 1520">
         <defs>
           <filter id="path-glow" x="-30%" y="-30%" width="160%" height="160%">
             <feGaussianBlur stdDeviation="4" result="blur" />
@@ -686,11 +686,11 @@ html_content = f"""<!DOCTYPE html>
           </filter>
         </defs>
 
-        <!-- Han River Ribbon across full map (1.5x scaled) -->
+        <!-- Han River Ribbon flowing between North/South stations -->
         <g id="han-river-group">
-          <path d="M -80 705 Q 375 705, 660 750 T 1050 855 T 1425 840 T 2175 990 L 2175 1050 Q 1425 900, 1050 915 T 660 810 T -80 765 Z"
-                fill="rgba(24, 53, 94, 0.4)" stroke="rgba(56, 189, 248, 0.15)" stroke-width="2" />
-          <text x="870" y="840" fill="rgba(56, 189, 248, 0.28)" font-size="32" font-weight="700" letter-spacing="14">한  강 (HAN RIVER)</text>
+          <path d="M -50 610 Q 350 610, 720 660 T 1040 815 T 1380 735 T 2180 860 L 2180 915 Q 1380 790, 1040 870 T 720 715 T -50 665 Z"
+                fill="rgba(24, 53, 94, 0.42)" stroke="rgba(56, 189, 248, 0.18)" stroke-width="2" />
+          <text x="890" y="790" fill="rgba(56, 189, 248, 0.28)" font-size="30" font-weight="700" letter-spacing="14">한  강 (HAN RIVER)</text>
         </g>
 
         <g id="tracks-layer"></g>
@@ -745,7 +745,7 @@ html_content = f"""<!DOCTYPE html>
     let userPath = [];
     let clearedStages = new Set(JSON.parse(localStorage.getItem("seoul_metro_cleared") || "[]"));
 
-    const defaultViewBox = {{ x: -30, y: 100, w: 2180, h: 1420 }};
+    const defaultViewBox = {{ x: -20, y: 0, w: 2180, h: 1520 }};
     let viewBox = {{ ...defaultViewBox }};
     let isPanning = false;
     let panStart = {{ x: 0, y: 0 }};
@@ -802,7 +802,7 @@ html_content = f"""<!DOCTYPE html>
       if (!GAME_DATA.lines[lineName]) continue;
       const item = document.createElement("div");
       item.className = "legend-item";
-      const isSpecial = ["KTX", "ITX-청춘", "무궁화호", "GTX-A"].includes(lineName);
+      const isSpecial = ["KTX", "ITX-청춘", "무궁화호", "GTX-A(북부)", "GTX-A(남부)"].includes(lineName);
       item.innerHTML = `<span class="legend-swatch" style="background:${{color}}; ${{isSpecial ? 'border-bottom: 2px dashed white;' : ''}}"></span><span>${{lineName}}</span>`;
       legendGrid.appendChild(item);
     }}
@@ -817,7 +817,7 @@ html_content = f"""<!DOCTYPE html>
       tracksLayer.innerHTML = '';
       for (const [lineName, seq] of Object.entries(GAME_DATA.lines)) {{
         const color = GAME_DATA.line_colors[lineName] || "#999";
-        const isSpecial = ["KTX", "ITX-청춘", "무궁화호", "GTX-A"].includes(lineName);
+        const isSpecial = ["KTX", "ITX-청춘", "무궁화호", "GTX-A(북부)", "GTX-A(남부)"].includes(lineName);
         for (let i = 0; i < seq.length - 1; i++) {{
           const u = GAME_DATA.stations[seq[i]];
           const v = GAME_DATA.stations[seq[i+1]];
