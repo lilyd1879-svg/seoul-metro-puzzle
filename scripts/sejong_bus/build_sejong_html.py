@@ -345,8 +345,8 @@ html_content = f"""<!DOCTYPE html>
 
   <header>
     <div class="logo-group">
-      <span class="logo-badge">SEJONG BUS 33</span>
-      <h1 class="logo-title">세종 바로타: 마지막 버스 (전 생활권 33개 노선)</h1>
+      <span class="logo-badge">SEJONG BUS 49</span>
+      <h1 class="logo-title">세종 바로타: 마지막 버스 (전 생활권 49개 노선)</h1>
     </div>
 
     <div class="header-controls">
@@ -422,12 +422,12 @@ html_content = f"""<!DOCTYPE html>
 
     <main class="map-container" id="map-area">
       <div class="guide-banner">
-        🚌 세종시 전 생활권 33개 노선 · 101개 정류장 (1~6생활권·읍면·광역) · 인접 정류장을 클릭해 연결하세요
+        🚌 세종시 전 생활권 49개 노선 · 111개 정류장 (1~6생활권·읍면·마을·광역) · 인접 정류장을 클릭해 연결하세요
       </div>
 
       <div class="legend-panel">
         <div class="legend-header" id="legend-toggle">
-          <span>🚌 세종 버스 범례 (33개 노선)</span>
+          <span>🚌 세종 버스 범례 (49개 노선)</span>
           <span id="legend-arrow">▼</span>
         </div>
         <div class="legend-grid" id="legend-grid"></div>
@@ -492,11 +492,11 @@ html_content = f"""<!DOCTYPE html>
   <!-- Guide Modal -->
   <div class="modal-overlay" id="guide-modal">
     <div class="guide-modal-box">
-      <h3>🚌 세종 30개 노선 버스 퍼즐 안내</h3>
+      <h3>🚌 세종 49개 노선 버스 퍼즐 안내</h3>
       <ul>
         <li><strong>BRT·광역급행(7개):</strong> B0(내부순환), B1(오송~대전역), B2(오송~반석역), B4(동측~반석역), B5(보조BRT), B7(청주공항), M1(누리동~정부대전청사)</li>
-        <li><strong>1·2·6생활권 지선(12개):</strong> 201~205, 221~222, 271~275번이 1생활권(고운·아름·종촌·도담·어진)과 공동캠퍼스를 촘촘히 잇습니다.</li>
-        <li><strong>읍면·광역 간선(11개):</strong> 52, 300, 340, 430, 550, 601, 801, 991, 1000, 1004, 1005번이 조치원·전의·소정·부강·장군·공주·신탄진·반석을 연결합니다.</li>
+        <li><strong>신도시 지선·순환(12개):</strong> 201~205, 221~222, 271~275번이 1~6생활권과 공동캠퍼스를 촘촘히 잇습니다.</li>
+        <li><strong>읍면·마을·광역(30개):</strong> 11~13, 31~32, 52~53, 61·63, 71~72, 81~82, 91~92, 300·340·430·550·601·655·661·801·910·991·1000·1002~1005번까지 세종 전역 노선을 수록했습니다.</li>
         <li><strong>금강 횡단:</strong> 금강 이북과 이남(3·4생활권·금남·대전)을 다리로 건널 때마다 횡단 횟수가 1회 증가합니다.</li>
       </ul>
       <button class="btn btn-primary" id="btn-close-guide" style="width: 100%; padding: 10px;">확인</button>
