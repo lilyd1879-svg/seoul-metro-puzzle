@@ -677,20 +677,20 @@ html_content = f"""<!DOCTYPE html>
         <div class="legend-grid" id="legend-grid"></div>
       </div>
 
-      <!-- Full Map ViewBox (v2 Circular Line 2 + Official Layout) -->
-      <svg id="metro-svg" viewBox="-20 0 2180 1520">
+      <!-- Full Map ViewBox (v3 Full 24+3 Lines, Official 4096x4096 Layout) -->
+      <svg id="metro-svg" viewBox="100 100 3920 3920">
         <defs>
           <filter id="path-glow" x="-30%" y="-30%" width="160%" height="160%">
-            <feGaussianBlur stdDeviation="4" result="blur" />
+            <feGaussianBlur stdDeviation="6" result="blur" />
             <feComposite in="SourceGraphic" in2="blur" operator="over" />
           </filter>
         </defs>
 
-        <!-- Han River Ribbon flowing between North/South stations -->
+        <!-- Han River Ribbon flowing between North/South stations (4096x4096) -->
         <g id="han-river-group">
-          <path d="M -50 610 Q 350 610, 720 660 T 1040 815 T 1380 735 T 2180 860 L 2180 915 Q 1380 790, 1040 870 T 720 715 T -50 665 Z"
-                fill="rgba(24, 53, 94, 0.42)" stroke="rgba(56, 189, 248, 0.18)" stroke-width="2" />
-          <text x="890" y="790" fill="rgba(56, 189, 248, 0.28)" font-size="30" font-weight="700" letter-spacing="14">한  강 (HAN RIVER)</text>
+          <path d="M 240 400 L 560 400 L 1040 1040 L 1440 1840 L 1680 2160 L 2060 2240 L 2440 2260 L 2840 2080 L 3200 1760 L 3840 1420 L 4096 1420 L 4096 1560 L 3840 1560 L 3240 1880 L 2860 2200 L 2440 2380 L 2060 2360 L 1640 2280 L 1360 1960 L 940 1140 L 460 520 L 240 520 Z"
+                fill="rgba(24, 53, 94, 0.42)" stroke="rgba(56, 189, 248, 0.18)" stroke-width="4" />
+          <text x="1720" y="2325" fill="rgba(56, 189, 248, 0.30)" font-size="44" font-weight="700" letter-spacing="18">한  강 (HAN RIVER)</text>
         </g>
 
         <g id="tracks-layer"></g>
@@ -745,7 +745,7 @@ html_content = f"""<!DOCTYPE html>
     let userPath = [];
     let clearedStages = new Set(JSON.parse(localStorage.getItem("seoul_metro_cleared") || "[]"));
 
-    const defaultViewBox = {{ x: -20, y: 0, w: 2180, h: 1520 }};
+    const defaultViewBox = {{ x: 100, y: 100, w: 3920, h: 3920 }};
     let viewBox = {{ ...defaultViewBox }};
     let isPanning = false;
     let panStart = {{ x: 0, y: 0 }};
@@ -796,10 +796,11 @@ html_content = f"""<!DOCTYPE html>
       }}
     }}
 
-    // Build Legend
+    // Build Legend (skip branch-only sub-keys so each main line appears once)
     const legendGrid = document.getElementById("legend-grid");
+    const skipLegend = new Set(["1호선(경부·장항)", "1호선(광명)", "1호선(서동탄)", "2호선(성수)", "2호선(신정)", "5호선(마천)", "경의중앙선(서울역)"]);
     for (const [lineName, color] of Object.entries(GAME_DATA.line_colors)) {{
-      if (!GAME_DATA.lines[lineName]) continue;
+      if (!GAME_DATA.lines[lineName] || skipLegend.has(lineName)) continue;
       const item = document.createElement("div");
       item.className = "legend-item";
       const isSpecial = ["KTX", "ITX-청춘", "무궁화호", "GTX-A(북부)", "GTX-A(남부)"].includes(lineName);
@@ -873,23 +874,23 @@ html_content = f"""<!DOCTYPE html>
         const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
         circle.setAttribute("cx", stData.x);
         circle.setAttribute("cy", stData.y);
-        circle.setAttribute("r", isTransfer ? "6.5" : "4");
+        circle.setAttribute("r", isTransfer ? "8" : "5");
         circle.setAttribute("fill", "#ffffff");
         circle.setAttribute("stroke", isTransfer ? "#0f172a" : "#334155");
-        circle.setAttribute("stroke-width", isTransfer ? "2.5" : "1.5");
+        circle.setAttribute("stroke-width", isTransfer ? "3" : "1.8");
         g.appendChild(circle);
 
         const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
         text.setAttribute("x", stData.lx !== undefined ? stData.lx : stData.x);
-        text.setAttribute("y", stData.ly !== undefined ? stData.ly : stData.y - 10);
+        text.setAttribute("y", stData.ly !== undefined ? stData.ly : stData.y - 12);
         text.setAttribute("text-anchor", stData.anchor || "middle");
         text.setAttribute("fill", isTransfer ? "#f8fafc" : "#cbd5e1");
-        text.setAttribute("font-size", isTransfer ? "10.5" : "9");
+        text.setAttribute("font-size", isTransfer ? "12.5" : "10.5");
         text.setAttribute("font-weight", isTransfer ? "700" : "500");
         text.setAttribute("font-family", "Pretendard, sans-serif");
         text.style.paintOrder = "stroke";
         text.style.stroke = "#070a11";
-        text.style.strokeWidth = "3.5px";
+        text.style.strokeWidth = "4.5px";
         text.style.strokeLinejoin = "round";
         text.textContent = stName;
         g.appendChild(text);
@@ -1080,11 +1081,11 @@ html_content = f"""<!DOCTYPE html>
     function analyzeUserPath() {{
       if (userPath.length < 2) return {{ transfers: 0, river: 0, seqs: [[]] }};
       const riverPairs = new Set([
-        "당산-합정", "합정-당산", "강변-잠실나루", "잠실나루-강변",
-        "용산-노량진", "노량진-용산", "옥수-압구정", "압구정-옥수",
-        "이촌-동작", "동작-이촌", "여의나루-마포", "마포-여의나루",
-        "뚝섬유원지-청담", "청담-뚝섬유원지", "마곡나루-디지털미디어시티", "디지털미디어시티-마곡나루",
-        "김포공항-대곡", "대곡-김포공항", "용산-영등포", "영등포-용산", "용산-광명", "광명-용산"
+        "용산-노량진", "노량진-용산", "합정-당산", "당산-합정", "강변-잠실나루", "잠실나루-강변",
+        "옥수-압구정", "압구정-옥수", "이촌-동작", "동작-이촌", "마포-여의나루", "여의나루-마포",
+        "광나루-천호", "천호-광나루", "자양-청담", "청담-자양", "장자호수공원-암사역사공원", "암사역사공원-장자호수공원",
+        "디지털미디어시티-마곡나루", "마곡나루-디지털미디어시티", "서울숲-압구정로데오", "압구정로데오-서울숲",
+        "용산-영등포", "영등포-용산"
       ]);
 
       let river = 0;
@@ -1125,35 +1126,51 @@ html_content = f"""<!DOCTYPE html>
         }}
       }}
 
+      const viaStations = new Set(
+        (currentStage.clues || []).filter(c => c.type === "via_station").map(c => c.val)
+      );
+
       for (const [stName, stData] of Object.entries(GAME_DATA.stations)) {{
         const g = document.getElementById(`st-${{stName}}`);
         if (!g) continue;
         const circle = g.querySelector("circle");
+        const text = g.querySelector("text");
         const isStart = stName === currentStage.start;
         const isEnd = stName === currentStage.end;
+        const isVia = viaStations.has(stName);
         const inPath = userPath.includes(stName);
 
         if (isStart) {{
           circle.setAttribute("fill", "#10b981");
           circle.setAttribute("stroke", "#ffffff");
-          circle.setAttribute("stroke-width", "3");
-          circle.setAttribute("r", "9");
+          circle.setAttribute("stroke-width", "4");
+          circle.setAttribute("r", "13");
+          if (text) text.setAttribute("fill", "#34d399");
         }} else if (isEnd) {{
           circle.setAttribute("fill", "#ef4444");
           circle.setAttribute("stroke", "#ffffff");
-          circle.setAttribute("stroke-width", "3");
-          circle.setAttribute("r", "9");
+          circle.setAttribute("stroke-width", "4");
+          circle.setAttribute("r", "13");
+          if (text) text.setAttribute("fill", "#f87171");
+        }} else if (isVia) {{
+          circle.setAttribute("fill", inPath ? "#38bdf8" : "#facc15");
+          circle.setAttribute("stroke", inPath ? "#facc15" : "#ffffff");
+          circle.setAttribute("stroke-width", "4");
+          circle.setAttribute("r", "12");
+          if (text) text.setAttribute("fill", "#fde047");
         }} else if (inPath) {{
           circle.setAttribute("fill", "#38bdf8");
           circle.setAttribute("stroke", "#0f172a");
-          circle.setAttribute("stroke-width", "2.5");
-          circle.setAttribute("r", "7");
+          circle.setAttribute("stroke-width", "3");
+          circle.setAttribute("r", "10");
+          if (text) text.setAttribute("fill", "#7dd3fc");
         }} else {{
           const isTransfer = stData.lines.length > 1;
           circle.setAttribute("fill", "#ffffff");
           circle.setAttribute("stroke", isTransfer ? "#0f172a" : "#334155");
-          circle.setAttribute("stroke-width", isTransfer ? "2.5" : "1.5");
-          circle.setAttribute("r", isTransfer ? "6.5" : "4");
+          circle.setAttribute("stroke-width", isTransfer ? "3" : "1.8");
+          circle.setAttribute("r", isTransfer ? "8" : "5");
+          if (text) text.setAttribute("fill", isTransfer ? "#f8fafc" : "#cbd5e1");
         }}
       }}
 
@@ -1273,7 +1290,7 @@ html_content = f"""<!DOCTYPE html>
       const relX = (e.clientX - rect.left) / rect.width;
       const relY = (e.clientY - rect.top) / rect.height;
 
-      const newW = Math.max(350, Math.min(3000, viewBox.w * zoomFactor));
+      const newW = Math.max(450, Math.min(5200, viewBox.w * zoomFactor));
       const newH = newW * (defaultViewBox.h / defaultViewBox.w);
       viewBox.x += (viewBox.w - newW) * relX;
       viewBox.y += (viewBox.h - newH) * relY;
@@ -1282,14 +1299,14 @@ html_content = f"""<!DOCTYPE html>
     }}, {{ passive: false }});
 
     document.getElementById("btn-zoom-in").addEventListener("click", () => {{
-      const newW = Math.max(350, viewBox.w * 0.9);
+      const newW = Math.max(450, viewBox.w * 0.9);
       const newH = newW * (defaultViewBox.h / defaultViewBox.w);
       viewBox.x += (viewBox.w - newW) / 2; viewBox.y += (viewBox.h - newH) / 2;
       viewBox.w = newW; viewBox.h = newH;
       updateSvgViewBox();
     }});
     document.getElementById("btn-zoom-out").addEventListener("click", () => {{
-      const newW = Math.min(3000, viewBox.w * 1.1);
+      const newW = Math.min(5200, viewBox.w * 1.1);
       const newH = newW * (defaultViewBox.h / defaultViewBox.w);
       viewBox.x += (viewBox.w - newW) / 2; viewBox.y += (viewBox.h - newH) / 2;
       viewBox.w = newW; viewBox.h = newH;
