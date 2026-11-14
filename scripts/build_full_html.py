@@ -595,6 +595,12 @@ html_content = f"""<!DOCTYPE html>
     </div>
 
     <div class="header-controls">
+      <div class="difficulty-tabs" id="mode-tabs" style="border-color: rgba(168, 85, 247, 0.35);">
+        <button class="diff-btn mode-btn active" data-mode="normal" title="기본 추리 모드">🧩 일반</button>
+        <button class="diff-btn mode-btn" data-mode="timeattack" title="제한 시간 내 클리어">⏱️ 타임어택</button>
+        <button class="diff-btn mode-btn" data-mode="oneshot" title="뒤로가기·초기화·힌트 금지">⚡ 원샷</button>
+        <button class="diff-btn mode-btn" data-mode="blind" title="역 이름 숨김 모드">🙈 블라인드</button>
+      </div>
       <div class="difficulty-tabs">
         <button class="diff-btn active" data-diff="쉬움">쉬움</button>
         <button class="diff-btn" data-diff="중간">중간</button>
@@ -668,7 +674,8 @@ html_content = f"""<!DOCTYPE html>
     <!-- Map Container -->
     <main class="map-container" id="map-area">
       <div class="guide-banner">
-        💡 전체 수도권 철도망이 표시됩니다 · 인접 역을 클릭해 연결하세요 (휠 줌/드래그 지원)
+        <span id="guide-banner-text">💡 전체 수도권 철도망이 표시됩니다 · 인접 역을 클릭해 연결하세요 (휠 줌/드래그 지원)</span>
+        <span id="mode-timer-badge" style="display:none; margin-left:10px; padding:2px 8px; border-radius:99px; background:rgba(239,68,68,0.22); color:#fca5a5; font-weight:700; font-family:'JetBrains Mono',monospace;">⏱️ 00:00</span>
       </div>
 
       <!-- Collapsible Line Legend -->
@@ -746,6 +753,10 @@ html_content = f"""<!DOCTYPE html>
     let currentDifficulty = "쉬움";
     let currentStageIndex = 0;
     let currentStage = null;
+    let currentMode = "normal";
+    let timerInterval = null;
+    let timeLeft = 0;
+    let modeFailed = false;
     let userPath = [];
     let hintStep = 0;
     let clearedStages = new Set(JSON.parse(localStorage.getItem("seoul_metro_cleared") || "[]"));
@@ -973,8 +984,57 @@ html_content = f"""<!DOCTYPE html>
 
       renderClues();
       hintStep = 0;
+      setupModeForStage();
       updatePathUI();
       playBeep(587.33, 'sine', 0.08);
+    }}
+
+    function setupModeForStage() {{
+      if (timerInterval) {{ clearInterval(timerInterval); timerInterval = null; }}
+      modeFailed = false;
+      const timerBadge = document.getElementById("mode-timer-badge");
+      const bannerText = document.getElementById("guide-banner-text");
+      const undoBtn = document.getElementById("btn-undo");
+      const resetBtn = document.getElementById("btn-reset");
+      const hintBtn = document.getElementById("btn-hint");
+      const hintSideBtn = document.getElementById("btn-hint-side");
+
+      const lockControls = (currentMode === "oneshot");
+      [undoBtn, resetBtn, hintBtn, hintSideBtn].forEach(b => {{
+        if (!b) return;
+        b.disabled = lockControls;
+        b.style.opacity = lockControls ? "0.35" : "1";
+        b.style.pointerEvents = lockControls ? "none" : "auto";
+      }});
+
+      if (currentMode === "timeattack") {{
+        const limits = {{ "쉬움": 60, "중간": 90, "어려움": 150, "초고난이도": 210 }};
+        timeLeft = limits[currentDifficulty] || 90;
+        timerBadge.style.display = "inline-block";
+        const fmt = (s) => `${{String(Math.floor(s/60)).padStart(2,'0')}}:${{String(s%60).padStart(2,'0')}}`;
+        timerBadge.textContent = `⏱️ ${{fmt(timeLeft)}}`;
+        bannerText.textContent = "⏱️ 타임어택 모드 · 제한 시간 안에 유일해를 완성하세요!";
+        timerInterval = setInterval(() => {{
+          timeLeft--;
+          timerBadge.textContent = `⏱️ ${{fmt(Math.max(0, timeLeft))}}`;
+          if (timeLeft <= 10) timerBadge.style.background = "rgba(239,68,68,0.55)";
+          if (timeLeft <= 0) {{
+            clearInterval(timerInterval); timerInterval = null;
+            modeFailed = true;
+            playBeep(150, 'sawtooth', 0.3);
+            alert("⏱️ 시간 초과! 타임어택 실패입니다. 난이도나 스테이지를 다시 선택해 재도전하세요.");
+          }}
+        }}, 1000);
+      }} else if (currentMode === "oneshot") {{
+        timerBadge.style.display = "none";
+        bannerText.textContent = "⚡ 원샷 모드 · 취소·초기화·힌트 불가! 한 번의 실수도 허용되지 않습니다.";
+      }} else if (currentMode === "blind") {{
+        timerBadge.style.display = "none";
+        bannerText.textContent = "🙈 블라인드 모드 · 역 이름이 숨겨집니다 (호버/방문 역만 표시)";
+      }} else {{
+        timerBadge.style.display = "none";
+        bannerText.textContent = "💡 전체 수도권 철도망이 표시됩니다 · 인접 역을 클릭해 연결하세요 (휠 줌/드래그 지원)";
+      }}
     }}
 
     function renderClues() {{
@@ -995,9 +1055,14 @@ html_content = f"""<!DOCTYPE html>
     }}
 
     function handleStationClick(stName) {{
+      if (modeFailed) {{
+        alert("현재 도전이 종료되었습니다. 스테이지를 다시 선택해 재도전하세요.");
+        return;
+      }}
       const lastStation = userPath[userPath.length - 1];
 
       if (stName === lastStation) {{
+        if (currentMode === "oneshot") return;
         if (userPath.length > 1) {{
           userPath.pop();
           playBeep(330, 'sine', 0.08);
@@ -1008,6 +1073,7 @@ html_content = f"""<!DOCTYPE html>
 
       const existingIdx = userPath.indexOf(stName);
       if (existingIdx !== -1) {{
+        if (currentMode === "oneshot") return;
         userPath = userPath.slice(0, existingIdx + 1);
         playBeep(370, 'sine', 0.08);
         updatePathUI();
@@ -1190,6 +1256,10 @@ html_content = f"""<!DOCTYPE html>
           circle.setAttribute("r", isTransfer ? "8" : "5");
           if (text) text.setAttribute("fill", isTransfer ? "#f8fafc" : "#cbd5e1");
         }}
+        if (text) {{
+          const showLabel = (currentMode !== "blind") || isStart || isEnd || isVia || inPath;
+          text.style.opacity = showLabel ? "1" : "0";
+        }}
       }}
 
       document.getElementById("current-station-count").textContent = `${{userPath.length}}역`;
@@ -1261,6 +1331,7 @@ html_content = f"""<!DOCTYPE html>
       const matchesSolution = JSON.stringify(userPath) === JSON.stringify(currentStage.path);
 
       if (isAtEnd && matchesSolution) {{
+        if (timerInterval) {{ clearInterval(timerInterval); timerInterval = null; }}
         playSuccessChime();
         clearedStages.add(currentStage.id);
         localStorage.setItem("seoul_metro_cleared", JSON.stringify([...clearedStages]));
@@ -1423,11 +1494,20 @@ html_content = f"""<!DOCTYPE html>
       }}
     }});
 
-    document.querySelectorAll(".diff-btn").forEach(btn => {{
+    document.querySelectorAll(".diff-btn:not(.mode-btn)").forEach(btn => {{
       btn.addEventListener("click", () => {{
-        document.querySelectorAll(".diff-btn").forEach(b => b.classList.remove("active"));
+        document.querySelectorAll(".diff-btn:not(.mode-btn)").forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
         loadStage(btn.dataset.diff, 0);
+      }});
+    }});
+
+    document.querySelectorAll(".mode-btn").forEach(btn => {{
+      btn.addEventListener("click", () => {{
+        document.querySelectorAll(".mode-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentMode = btn.dataset.mode;
+        loadStage(currentDifficulty, currentStageIndex);
       }});
     }});
 
