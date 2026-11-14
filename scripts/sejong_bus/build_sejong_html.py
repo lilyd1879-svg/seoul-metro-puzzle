@@ -427,7 +427,7 @@ html_content = f"""<!DOCTYPE html>
 
       <div class="legend-panel">
         <div class="legend-header" id="legend-toggle">
-          <span>🚌 1생활권 버스 범례 (12개 노선)</span>
+          <span>🚌 1생활권 버스 범례 (17개 노선)</span>
           <span id="legend-arrow">▼</span>
         </div>
         <div class="legend-grid" id="legend-grid"></div>
@@ -495,6 +495,7 @@ html_content = f"""<!DOCTYPE html>
       <ul>
         <li><strong>대상 권역:</strong> 세종시 <strong>1생활권(1-1 고운동 · 1-2 아름동 · 1-3 종촌동 · 1-4 도담동 · 1-5 어진동)</strong>과 인접 관문 정류장을 중심으로 구성되었습니다.</li>
         <li><strong>생활권 순환(201·202·203·205):</strong> 아파트 단지(가락·범지기·가재·도램마을)와 정부세종청사, 충남대병원, 호수공원을 순환합니다.</li>
+        <li><strong>27X번대 지선(271~275):</strong> 누리동·해밀동과 1생활권(도담·아름·고운·어진동), 은하수공원, 호수공원을 촘촘히 연결합니다.</li>
         <li><strong>방축천 횡단:</strong> 1생활권 서측(고운·아름·종촌동)과 동측(도담·어진동) 사이의 <strong>방축천</strong> 다리를 건널 때마다 횡단 횟수가 1회 증가합니다.</li>
         <li><strong>조작법:</strong> 인접 정류장을 차례로 클릭해 연결하며, 이미 선택한 정류장을 다시 클릭하면 그 지점까지 되돌아갑니다.</li>
       </ul>
