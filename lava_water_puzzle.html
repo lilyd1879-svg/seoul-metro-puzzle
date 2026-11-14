@@ -401,6 +401,7 @@
         <button class="primary" id="btn-check" type="button">확인하기</button>
         <button class="secondary" id="btn-reset" type="button">돌 비우기</button>
         <button class="secondary" id="btn-new" type="button">새 게임</button>
+        <button class="secondary" id="btn-random-map" type="button">랜덤 맵</button>
         <button id="btn-hint" type="button">가능 칸 힌트</button>
       </div>
 
@@ -796,6 +797,7 @@
         const btnCheck = document.getElementById("btn-check");
         const btnReset = document.getElementById("btn-reset");
         const btnNew = document.getElementById("btn-new");
+        const btnRandomMap = document.getElementById("btn-random-map");
         const btnHint = document.getElementById("btn-hint");
 
         function clearMessage() {
@@ -898,11 +900,14 @@
           renderBoard();
         });
 
-        btnNew.addEventListener("click", () => {
+        function loadNewRandomMap() {
           gameState = createPuzzle();
           clearMessage();
           renderBoard();
-        });
+        }
+
+        btnNew.addEventListener("click", loadNewRandomMap);
+        btnRandomMap.addEventListener("click", loadNewRandomMap);
 
         btnHint.addEventListener("click", () => {
           showHints = !showHints;
