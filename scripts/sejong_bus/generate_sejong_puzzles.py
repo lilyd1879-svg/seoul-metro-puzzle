@@ -88,12 +88,12 @@ def optimize_node_layout(stations, adj):
             if mag > max_step:
                 fx = fx / mag * max_step
                 fy = fy / mag * max_step
-            nx = max(120.0, min(3080.0, stations[n]["x"] + fx))
+            nx = max(120.0, min(3480.0, stations[n]["x"] + fx))
             ny = stations[n]["y"] + fy
             if stations[n]["bank"] == "north":
-                ny = max(90.0, min(1730.0, ny))
+                ny = max(80.0, min(1830.0, ny))
             else:
-                ny = max(1890.0, min(2500.0, ny))
+                ny = max(1990.0, min(2680.0, ny))
             stations[n]["x"] = round(nx, 1)
             stations[n]["y"] = round(ny, 1)
 
@@ -102,7 +102,7 @@ def optimize_node_layout(stations, adj):
                    stations[names[i]]["y"] - stations[names[j]]["y"])
         for i in range(len(names)) for j in range(i + 1, len(names))
     )
-    print(f"Node layout optimized (81 stops). Minimum stop distance: {closest:.1f}px", flush=True)
+    print(f"Node layout optimized ({len(names)} stops). Minimum stop distance: {closest:.1f}px", flush=True)
 
 
 def optimize_labels(stations, adj):

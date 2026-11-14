@@ -345,8 +345,8 @@ html_content = f"""<!DOCTYPE html>
 
   <header>
     <div class="logo-group">
-      <span class="logo-badge">SEJONG BUS 30</span>
-      <h1 class="logo-title">세종 바로타: 마지막 버스 (전역 30개 노선 · 1생활권 정밀망)</h1>
+      <span class="logo-badge">SEJONG BUS 33</span>
+      <h1 class="logo-title">세종 바로타: 마지막 버스 (전 생활권 33개 노선)</h1>
     </div>
 
     <div class="header-controls">
@@ -422,18 +422,18 @@ html_content = f"""<!DOCTYPE html>
 
     <main class="map-container" id="map-area">
       <div class="guide-banner">
-        🚌 세종시 30개 노선 · 81개 정류장 (BRT·M버스·200·27X·읍면·광역) · 인접 정류장을 클릭해 연결하세요
+        🚌 세종시 전 생활권 33개 노선 · 101개 정류장 (1~6생활권·읍면·광역) · 인접 정류장을 클릭해 연결하세요
       </div>
 
       <div class="legend-panel">
         <div class="legend-header" id="legend-toggle">
-          <span>🚌 세종 버스 범례 (30개 노선)</span>
+          <span>🚌 세종 버스 범례 (33개 노선)</span>
           <span id="legend-arrow">▼</span>
         </div>
         <div class="legend-grid" id="legend-grid"></div>
       </div>
 
-      <svg id="bus-svg" viewBox="40 20 3120 2560">
+      <svg id="bus-svg" viewBox="40 20 3520 2760">
         <defs>
           <filter id="path-glow" x="-30%" y="-30%" width="160%" height="160%">
             <feGaussianBlur stdDeviation="6" result="blur" />
@@ -444,16 +444,18 @@ html_content = f"""<!DOCTYPE html>
         <!-- Zone Watermarks -->
         <g id="zone-labels" fill="rgba(148, 163, 184, 0.11)" font-size="48" font-weight="800" letter-spacing="4">
           <text x="520" y="540">1생활권 (고운·아름·종촌)</text>
-          <text x="1500" y="700">1생활권 (도담·어진)</text>
-          <text x="2180" y="640">5·6생활권</text>
-          <text x="1360" y="2180">3·4생활권</text>
+          <text x="1560" y="700">1생활권 (도담·어진)</text>
+          <text x="860" y="1640">2생활권 (다정·새롬·한솔)</text>
+          <text x="2340" y="640">5·6생활권 (해밀·누리·용호·다솜)</text>
+          <text x="1280" y="2320">3생활권 (대평·보람·소담)</text>
+          <text x="2420" y="2260">4생활권 (반곡·집현)</text>
         </g>
 
         <!-- Geumgang River (금강) Ribbon dividing North Bank and South Bank -->
         <g id="geumgang-river-group">
-          <path d="M 40 1830 Q 820 1775 1600 1810 T 3160 1745 L 3160 1835 Q 1600 1895 820 1860 T 40 1915 Z"
+          <path d="M 40 1920 Q 920 1865 1800 1900 T 3560 1835 L 3560 1925 Q 1800 1985 920 1950 T 40 2005 Z"
                 fill="rgba(14, 116, 144, 0.30)" stroke="rgba(56, 189, 248, 0.25)" stroke-width="3" />
-          <text x="540" y="1858" fill="rgba(56, 189, 248, 0.38)" font-size="36" font-weight="700" letter-spacing="14">금  강 (GEUMGANG RIVER)</text>
+          <text x="640" y="1950" fill="rgba(56, 189, 248, 0.38)" font-size="38" font-weight="700" letter-spacing="14">금  강 (GEUMGANG RIVER)</text>
         </g>
 
         <g id="tracks-layer"></g>
@@ -512,9 +514,9 @@ html_content = f"""<!DOCTYPE html>
     let currentStage = null;
     let userPath = [];
     let hintStep = 0;
-    let clearedStages = new Set(JSON.parse(localStorage.getItem("sejong_full30_bus_cleared") || "[]"));
+    let clearedStages = new Set(JSON.parse(localStorage.getItem("sejong_all33_bus_cleared") || "[]"));
 
-    const defaultViewBox = {{ x: 40, y: 20, w: 3120, h: 2560 }};
+    const defaultViewBox = {{ x: 40, y: 20, w: 3520, h: 2760 }};
     let viewBox = {{ ...defaultViewBox }};
     let isPanning = false;
     let panStart = {{ x: 0, y: 0 }};
@@ -1002,7 +1004,7 @@ html_content = f"""<!DOCTYPE html>
       if (isAtEnd && matchesSolution) {{
         playSuccessChime();
         clearedStages.add(currentStage.id);
-        localStorage.setItem("sejong_full30_bus_cleared", JSON.stringify([...clearedStages]));
+        localStorage.setItem("sejong_all33_bus_cleared", JSON.stringify([...clearedStages]));
         document.getElementById("modal-route-display").textContent = userPath.join(" ➔ ");
         document.getElementById("victory-modal").classList.add("active");
       }} else if (manual) {{
