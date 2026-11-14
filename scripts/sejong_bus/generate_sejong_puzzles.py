@@ -9,8 +9,8 @@ import math
 import random
 from collections import defaultdict
 from sejong_bus_data import (
-    STOPS_COORDS, LINES, LINE_COLORS, STREAM_CROSSINGS,
-    WEST_BANK, EAST_BANK
+    STOPS_COORDS, LINES, LINE_COLORS, GEUMGANG_CROSSINGS,
+    NORTH_BANK, SOUTH_BANK
 )
 
 
@@ -21,7 +21,7 @@ def build_stations_dict():
             "x": float(x),
             "y": float(y),
             "lines": [],
-            "bank": "west" if name in WEST_BANK else "east"
+            "bank": "north" if name in NORTH_BANK else "south"
         }
     for line_name, seq in LINES.items():
         for st in seq:
@@ -30,50 +30,107 @@ def build_stations_dict():
     return stations
 
 
-def gentle_spread(stations):
+def optimize_node_layout(stations, adj):
+    """Force-directed + minimum-distance constraint layout optimizer."""
     names = list(stations.keys())
-    min_dist = 105.0
-    for _ in range(100):
-        moved = False
+    orig = {n: (stations[n]["x"], stations[n]["y"]) for n in names}
+    min_dist = 130.0
+
+    for it in range(160):
+        forces = {n: [0.0, 0.0] for n in names}
+
+        # 1. Pairwise repulsion (strong below min_dist, gentle Coulomb above)
         for i in range(len(names)):
+            n1 = names[i]
+            x1, y1 = stations[n1]["x"], stations[n1]["y"]
             for j in range(i + 1, len(names)):
-                n1, n2 = names[i], names[j]
-                if stations[n1]["bank"] != stations[n2]["bank"]:
-                    # Keep North and South banks separated across Geumgang
-                    continue
-                dx = stations[n1]["x"] - stations[n2]["x"]
-                dy = stations[n1]["y"] - stations[n2]["y"]
-                if abs(dx) >= min_dist or abs(dy) >= min_dist:
-                    continue
+                n2 = names[j]
+                dx = x1 - stations[n2]["x"]
+                dy = y1 - stations[n2]["y"]
                 d = math.hypot(dx, dy)
+                if d < 0.1:
+                    dx, dy, d = 1.0, 0.0, 1.0
                 if d < min_dist:
-                    moved = True
-                    ux, uy = (dx / d, dy / d) if d > 0.1 else (1.0, 0.0)
-                    push = (min_dist - d) * 0.4
-                    stations[n1]["x"] = round(stations[n1]["x"] + ux * push, 1)
-                    stations[n1]["y"] = round(stations[n1]["y"] + uy * push, 1)
-                    stations[n2]["x"] = round(stations[n2]["x"] - ux * push, 1)
-                    stations[n2]["y"] = round(stations[n2]["y"] - uy * push, 1)
-        if not moved:
-            break
+                    f = (min_dist - d) * 0.45
+                elif d < 240.0:
+                    f = 1800.0 / (d * d)
+                else:
+                    continue
+                ux, uy = dx / d, dy / d
+                forces[n1][0] += ux * f
+                forces[n1][1] += uy * f
+                forces[n2][0] -= ux * f
+                forces[n2][1] -= uy * f
+
+        # 2. Gentle spring toward neighbors to keep connected routes smooth
+        for n in names:
+            x1, y1 = stations[n]["x"], stations[n]["y"]
+            nbrs = set(nbr for nbr, _ in adj[n])
+            for nbr in nbrs:
+                dx = stations[nbr]["x"] - x1
+                dy = stations[nbr]["y"] - y1
+                d = math.hypot(dx, dy)
+                if d > 220.0:
+                    pull = (d - 220.0) * 0.02
+                    forces[n][0] += (dx / d) * pull
+                    forces[n][1] += (dy / d) * pull
+
+            # 3. Anchor tether so geographic topology stays faithful
+            ox, oy = orig[n]
+            forces[n][0] += (ox - x1) * 0.06
+            forces[n][1] += (oy - y1) * 0.06
+
+        # Apply damped forces with bank & canvas constraints
+        max_step = 18.0 * (1.0 - it / 200.0)
+        for n in names:
+            fx, fy = forces[n]
+            mag = math.hypot(fx, fy)
+            if mag > max_step:
+                fx = fx / mag * max_step
+                fy = fy / mag * max_step
+            nx = max(120.0, min(3080.0, stations[n]["x"] + fx))
+            ny = stations[n]["y"] + fy
+            if stations[n]["bank"] == "north":
+                ny = max(90.0, min(1730.0, ny))
+            else:
+                ny = max(1890.0, min(2500.0, ny))
+            stations[n]["x"] = round(nx, 1)
+            stations[n]["y"] = round(ny, 1)
+
+    closest = min(
+        math.hypot(stations[names[i]]["x"] - stations[names[j]]["x"],
+                   stations[names[i]]["y"] - stations[names[j]]["y"])
+        for i in range(len(names)) for j in range(i + 1, len(names))
+    )
+    print(f"Node layout optimized (81 stops). Minimum stop distance: {closest:.1f}px", flush=True)
 
 
-def optimize_labels(stations):
+def optimize_labels(stations, adj):
     placed_boxes = []
     candidates = [
         (0, -18, "middle"), (0, 24, "middle"), (14, 5, "start"), (-14, 5, "end"),
         (12, -14, "start"), (-12, -14, "end"), (12, 22, "start"), (-12, 22, "end"),
-        (0, -30, "middle"), (0, 36, "middle"), (22, 5, "start"), (-22, 5, "end")
+        (0, -30, "middle"), (0, 36, "middle"), (22, 5, "start"), (-22, 5, "end"),
+        (18, -24, "start"), (-18, -24, "end"), (18, 30, "start"), (-18, 30, "end"),
     ]
-    station_circles = [(st["x"] - 10, st["y"] - 10, st["x"] + 10, st["y"] + 10) for st in stations.values()]
+    station_circles = [(st["x"] - 11, st["y"] - 11, st["x"] + 11, st["y"] + 11) for st in stations.values()]
 
     def overlap(b1, b2):
         return max(0, min(b1[2], b2[2]) - max(b1[0], b2[0])) * max(0, min(b1[3], b2[3]) - max(b1[1], b2[1]))
 
+    def dist_pt_seg(px, py, x1, y1, x2, y2):
+        vx, vy = x2 - x1, y2 - y1
+        l2 = vx * vx + vy * vy
+        if l2 < 1e-6:
+            return math.hypot(px - x1, py - y1)
+        t = max(0.0, min(1.0, ((px - x1) * vx + (py - y1) * vy) / l2))
+        return math.hypot(px - (x1 + t * vx), py - (y1 + t * vy))
+
     for name in sorted(stations.keys(), key=lambda n: -len(stations[n]["lines"])):
         st = stations[name]
         x, y = st["x"], st["y"]
-        w, h = len(name) * 12 + 6, 17
+        w, h = len(name) * 11.5 + 6, 16
+        nbrs = list(set(nbr for nbr, _ in adj[name]))
         best_cand = None
         best_score = 999999
 
@@ -86,16 +143,26 @@ def optimize_labels(stations):
             else:
                 box = (lx - w, ly - h + 2, lx, ly + 2)
 
+            cx_box = (box[0] + box[2]) / 2
+            cy_box = (box[1] + box[3]) / 2
+
             score = sum(
-                overlap(box, pb) * 10
+                overlap(box, pb) * 12
                 for pb in placed_boxes
                 if not (box[2] < pb[0] or box[0] > pb[2] or box[3] < pb[1] or box[1] > pb[3])
             )
             score += sum(
-                overlap(box, sc) * 5
+                overlap(box, sc) * 6
                 for sc in station_circles
                 if not (box[2] < sc[0] or box[0] > sc[2] or box[3] < sc[1] or box[1] > sc[3])
             )
+            # Penalize sitting directly on incident bus lines
+            for nbr in nbrs:
+                nx, ny = stations[nbr]["x"], stations[nbr]["y"]
+                d_edge = dist_pt_seg(cx_box, cy_box, x, y, nx, ny)
+                if d_edge < 14.0:
+                    score += (14.0 - d_edge) * 15.0
+
             score += (abs(dx) + abs(dy)) * 0.05
             if score < best_score:
                 best_score = score
@@ -156,7 +223,7 @@ def get_valid_line_sequences(path, adj):
 
 
 def analyze_path(path, adj):
-    river = sum(1 for i in range(len(path) - 1) if (path[i], path[i + 1]) in STREAM_CROSSINGS)
+    river = sum(1 for i in range(len(path) - 1) if (path[i], path[i + 1]) in GEUMGANG_CROSSINGS)
     seqs = get_valid_line_sequences(path, adj)
     transfers = len(seqs[0]) - 1 if seqs and seqs[0] else 0
     return transfers, river, seqs
@@ -220,8 +287,8 @@ def make_clue_obj(ctype, val):
         return {"type": ctype, "val": val, "text": f"최소 노선 환승 {val}회"}
     if ctype == "river_crossings":
         if val == 0:
-            return {"type": ctype, "val": val, "text": "방축천을 건너지 않음 (횡단 0회)"}
-        return {"type": ctype, "val": val, "text": f"방축천 다리 총 {val}회 횡단"}
+            return {"type": ctype, "val": val, "text": "금강을 건너지 않음 (횡단 0회)"}
+        return {"type": ctype, "val": val, "text": f"금강 다리 총 {val}회 횡단"}
     if ctype == "via_station":
         return {"type": ctype, "val": val, "text": f"'{val}' 정류장 반드시 경유"}
     if ctype == "avoid_station":
@@ -359,9 +426,9 @@ def generate_tier_puzzles(adj, stations, diff, min_len, max_len, min_tr, max_tr,
 def main():
     rng = random.Random(20261114)
     stations = build_stations_dict()
-    gentle_spread(stations)
-    optimize_labels(stations)
     adj = build_graph()
+    optimize_node_layout(stations, adj)
+    optimize_labels(stations, adj)
 
     stages = []
     stages += generate_tier_puzzles(adj, stations, "쉬움", 4, 6, 0, 1, 10, rng, allow_line_seq=True)
