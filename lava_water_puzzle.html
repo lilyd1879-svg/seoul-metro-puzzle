@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>용암과 물의 돌다리 퍼즐 (10×10)</title>
+  <style>
+    :root {
+      --bg: #0f131a;
+      --panel: #171d27;
+      --panel-border: #283244;
+      --text: #e6edf7;
+      --muted: #93a3b8;
+      --lava-1: #ff5722;
+      --lava-2: #b71c1c;
+      --water-1: #29b6f6;
+      --water-2: #0d47a1;
+      --empty-1: #232b38;
+      --empty-2: #1b222d;
+      --stone-1: #5a6578;
+      --stone-2: #343c4a;
+      --stone-border: #8b9bb4;
+      --ok: #22c55e;
+      --err: #ef4444;
+      --warn: #f59e0b;
+      --accent: #38bdf8;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #1b2434 0%, var(--bg) 65%);
+      color: var(--text);
+      font-family: "Pretendard", "Noto Sans KR", system-ui, -apple-system, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 24px 16px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 960px;
+      display: grid;
+      grid-template-columns: minmax(320px, 540px) 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    @media (max-width: 860px) {
+      .app {
+        grid-template-columns: 1fr;
+        max-width: 560px;
+      }
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      font-size: 0.84rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .stat-box {
+      background: #11161f;
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .stat-value {
+      font-size: 1.35rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat-value.match {
+      color: var(--ok);
+    }
+
+    .stat-value.over {
+      color: var(--warn);
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 4px;
+      background: #0b0e14;
+      padding: 8px;
+      border-radius: 12px;
+      border: 1px solid var(--panel-border);
+      aspect-ratio: 1 / 1;
+      user-select: none;
+    }
+
+    .cell {
+      position: relative;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.08s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+      overflow: hidden;
+    }
+
+    .cell:hover {
+      transform: scale(1.04);
+      z-index: 2;
+      border-color: rgba(255, 255, 255, 0.45);
+    }
+
+    .cell:active {
+      transform: scale(0.96);
+    }
+
+    .cell.terrain-lava {
+      background: linear-gradient(135deg, var(--lava-1), var(--lava-2));
+      box-shadow: inset 0 0 10px rgba(255, 160, 0, 0.35);
+    }
+
+    .cell.terrain-water {
+      background: linear-gradient(135deg, var(--water-1), var(--water-2));
+      box-shadow: inset 0 0 10px rgba(129, 212, 250, 0.3);
+    }
+
+    .cell.terrain-empty {
+      background: linear-gradient(135deg, var(--empty-1), var(--empty-2));
+    }
+
+    /* Stone overlay: original terrain remains underneath in data & subtly in border/corner */
+    .cell.has-stone::before {
+      content: "";
+      position: absolute;
+      inset: 3px;
+      border-radius: 5px;
+      background: linear-gradient(145deg, var(--stone-1), var(--stone-2));
+      border: 2px solid var(--stone-border);
+      box-shadow:
+        inset 0 2px 3px rgba(255, 255, 255, 0.25),
+        inset 0 -3px 4px rgba(0, 0, 0, 0.45),
+        0 2px 6px rgba(0, 0, 0, 0.5);
+      z-index: 1;
+    }
+
+    .cell.invalid-stone::before {
+      border-color: var(--err);
+      box-shadow:
+        0 0 0 2px rgba(239, 68, 68, 0.45),
+        inset 0 0 8px rgba(239, 68, 68, 0.45);
+    }
+
+    .cell.hint-valid::after {
+      content: "";
+      position: absolute;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.78);
+      box-shadow: 0 0 6px rgba(255, 255, 255, 0.9);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .cell.has-stone.hint-valid::after {
+      display: none;
+    }
+
+    .marker {
+      position: relative;
+      z-index: 2;
+      font-weight: 900;
+      font-size: 0.92rem;
+      line-height: 1;
+      padding: 3px 6px;
+      border-radius: 5px;
+      color: #fff;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+      pointer-events: none;
+    }
+
+    .marker-start {
+      background: rgba(16, 185, 129, 0.9);
+      border: 1px solid #a7f3d0;
+    }
+
+    .marker-end {
+      background: rgba(245, 158, 11, 0.92);
+      border: 1px solid #fde68a;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    button {
+      border: 1px solid var(--panel-border);
+      background: #212938;
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s ease, transform 0.08s ease, border-color 0.15s ease;
+    }
+
+    button:hover {
+      background: #2b364a;
+      border-color: #41506b;
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    button.primary {
+      background: #0284c7;
+      border-color: #38bdf8;
+      color: #fff;
+      flex: 1 1 120px;
+    }
+
+    button.primary:hover {
+      background: #0369a1;
+    }
+
+    button.secondary {
+      flex: 1 1 100px;
+    }
+
+    button.toggle-active {
+      background: #1e3a5f;
+      border-color: var(--accent);
+      color: #bae6fd;
+    }
+
+    .message-box {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      border: 1px solid var(--panel-border);
+      background: #11161f;
+      display: none;
+    }
+
+    .message-box.show {
+      display: block;
+    }
+
+    .message-box.success {
+      border-color: rgba(34, 197, 94, 0.5);
+      background: rgba(34, 197, 94, 0.12);
+      color: #dcfce7;
+    }
+
+    .message-box.error {
+      border-color: rgba(239, 68, 68, 0.5);
+      background: rgba(239, 68, 68, 0.12);
+      color: #fee2e2;
+    }
+
+    .message-title {
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .message-list {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .side-panel h2 {
+      margin: 0 0 12px;
+      font-size: 1.05rem;
+    }
+
+    .legend {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .swatch {
+      width: 20px;
+      height: 20px;
+      border-radius: 5px;
+      flex-shrink: 0;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .swatch.lava { background: linear-gradient(135deg, var(--lava-1), var(--lava-2)); }
+    .swatch.water { background: linear-gradient(135deg, var(--water-1), var(--water-2)); }
+    .swatch.empty { background: linear-gradient(135deg, var(--empty-1), var(--empty-2)); }
+    .swatch.stone {
+      background: linear-gradient(145deg, var(--stone-1), var(--stone-2));
+      border: 2px solid var(--stone-border);
+    }
+
+    .rules {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.65;
+    }
+
+    .rules li + li {
+      margin-top: 6px;
+    }
+
+    .rules strong {
+      color: var(--text);
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="card">
+      <div class="header">
+        <div>
+          <h1>용암과 물의 돌다리 퍼즐</h1>
+          <div class="subtitle">용암과 물이 만나는 지점에 돌을 놓아 S에서 E까지 연결하세요</div>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat-box">
+          <span class="stat-label">현재 돌 개수</span>
+          <span class="stat-value" id="current-stones">0</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">최소 돌 개수</span>
+          <span class="stat-value" id="min-stones">0</span>
+        </div>
+      </div>
+
+      <div class="board" id="board" role="grid" aria-label="10x10 퍼즐 격자판"></div>
+
+      <div class="controls">
+        <button class="primary" id="btn-check" type="button">확인하기</button>
+        <button class="secondary" id="btn-reset" type="button">돌 비우기</button>
+        <button class="secondary" id="btn-new" type="button">새 게임</button>
+        <button id="btn-hint" type="button">가능 칸 힌트</button>
+      </div>
+
+      <div class="message-box" id="message-box" aria-live="polite"></div>
+    </section>
+
+    <aside class="card side-panel">
+      <h2>범례 및 규칙</h2>
+      <div class="legend">
+        <div class="legend-item"><span class="swatch lava"></span><span>용암 (Lava)</span></div>
+        <div class="legend-item"><span class="swatch water"></span><span>물 (Water)</span></div>
+        <div class="legend-item"><span class="swatch empty"></span><span>빈칸 (Empty)</span></div>
+        <div class="legend-item"><span class="swatch stone"></span><span>돌 (Stone)</span></div>
+      </div>
+      <ul class="rules">
+        <li><strong>돌 배치/취소:</strong> 아무 칸이나 클릭하면 돌을 놓거나 취소할 수 있습니다. 취소 시 원래 지형이 그대로 복원됩니다.</li>
+        <li><strong>환경 조건:</strong> 돌이 놓인 칸의 <strong>주변 8칸</strong>에 용암과 물이 각각 1개 이상 있어야 합니다. (자기 자신의 원래 지형은 제외, 돌로 가려진 용암·물은 포함)</li>
+        <li><strong>연결 조건:</strong> <strong>S와 E에도 반드시 돌</strong>을 놓아야 하며, 모든 돌 경로가 <strong>상하좌우</strong>로 끊기지 않고 이어져야 합니다. (대각선 불가)</li>
+        <li><strong>최소 개수:</strong> 현재 놓은 돌의 개수가 BFS로 계산된 <strong>최소 돌 개수</strong>와 정확히 일치해야 성공입니다.</li>
+      </ul>
+    </aside>
+  </main>
+
+  <script>
+    (function (globalScope) {
+      "use strict";
+
+      const GRID_SIZE = 10;
+      const TERRAIN_TYPES = Object.freeze({
+        EMPTY: "empty",
+        LAVA: "lava",
+        WATER: "water"
+      });
+
+      const DIRS_4 = [
+        [-1, 0],
+        [1, 0],
+        [0, -1],
+        [0, 1]
+      ];
+
+      function inBounds(r, c) {
+        return r >= 0 && r < GRID_SIZE && c >= 0 && c < GRID_SIZE;
+      }
+
+      function createEmptyBooleanGrid() {
+        return Array.from({ length: GRID_SIZE }, () => Array(GRID_SIZE).fill(false));
+      }
+
+      /**
+       * Checks whether a stone at (r, c) satisfies the environment condition:
+       * Among the 8 surrounding cells (excluding (r, c) itself), there must be
+       * at least one 'lava' and at least one 'water' in the immutable terrain.
+       * Stones placed on top of lava/water do not alter terrain, so covered cells still count.
+       */
+      function checkEnvironmentAt(terrain, r, c) {
+        let hasLava = false;
+        let hasWater = false;
+
+        for (let dr = -1; dr <= 1; dr++) {
+          for (let dc = -1; dc <= 1; dc++) {
+            if (dr === 0 && dc === 0) continue; // Exclude self
+            const nr = r + dr;
+            const nc = c + dc;
+            if (!inBounds(nr, nc)) continue;
+
+            const cellTerrain = terrain[nr][nc];
+            if (cellTerrain === TERRAIN_TYPES.LAVA) hasLava = true;
+            else if (cellTerrain === TERRAIN_TYPES.WATER) hasWater = true;
+
+            if (hasLava && hasWater) return true;
+          }
+        }
+        return false;
+      }
+
+      function computeValidPlacementGrid(terrain) {
+        return Array.from({ length: GRID_SIZE }, (_, r) =>
+          Array.from({ length: GRID_SIZE }, (_, c) => checkEnvironmentAt(terrain, r, c))
+        );
+      }
+
+      /**
+       * Finds 4-directional connected components of cells where validGrid[r][c] is true.
+       */
+      function findValidComponents(validGrid) {
+        const visited = createEmptyBooleanGrid();
+        const components = [];
+
+        for (let r = 0; r < GRID_SIZE; r++) {
+          for (let c = 0; c < GRID_SIZE; c++) {
+            if (!validGrid[r][c] || visited[r][c]) continue;
+
+            const comp = [];
+            const queue = [[r, c]];
+            visited[r][c] = true;
+
+            for (let head = 0; head < queue.length; head++) {
+              const [cr, cc] = queue[head];
+              comp.push({ r: cr, c: cc });
+
+              for (const [dr, dc] of DIRS_4) {
+                const nr = cr + dr;
+                const nc = cc + dc;
+                if (inBounds(nr, nc) && validGrid[nr][nc] && !visited[nr][nc]) {
+                  visited[nr][nc] = true;
+                  queue.push([nr, nc]);
+                }
+              }
+            }
+            components.push(comp);
+          }
+        }
+        return components;
+      }
+
+      /**
+       * Uses BFS over cells satisfying validGrid (or any boolean passable grid)
+       * to compute the shortest 4-directional path from start to end (inclusive of start and end).
+       * Returns { minStones, path } or null if unreachable.
+       */
+      function computeShortestPath(passableGrid, start, end) {
+        if (!passableGrid[start.r][start.c] || !passableGrid[end.r][end.c]) {
+          return null;
+        }
+        if (start.r === end.r && start.c === end.c) {
+          return { minStones: 1, path: [{ r: start.r, c: start.c }] };
+        }
+
+        const visited = createEmptyBooleanGrid();
+        const parent = Array.from({ length: GRID_SIZE }, () => Array(GRID_SIZE).fill(null));
+        const queue = [[start.r, start.c, 1]];
+        visited[start.r][start.c] = true;
+
+        for (let head = 0; head < queue.length; head++) {
+          const [cr, cc, dist] = queue[head];
+
+          for (const [dr, dc] of DIRS_4) {
+            const nr = cr + dr;
+            const nc = cc + dc;
+            if (!inBounds(nr, nc) || !passableGrid[nr][nc] || visited[nr][nc]) continue;
+
+            visited[nr][nc] = true;
+            parent[nr][nc] = [cr, cc];
+
+            if (nr === end.r && nc === end.c) {
+              const path = [];
+              let cur = [nr, nc];
+              while (cur !== null) {
+                path.push({ r: cur[0], c: cur[1] });
+                cur = parent[cur[0]][cur[1]];
+              }
+              path.reverse();
+              return { minStones: dist + 1, path };
+            }
+
+            queue.push([nr, nc, dist + 1]);
+          }
+        }
+
+        return null;
+      }
+
+      /**
+       * Checks whether S and E both have stones and are connected 4-directionally via placed stones.
+       */
+      function checkConnection(stones, start, end) {
+        if (!stones[start.r][start.c] || !stones[end.r][end.c]) {
+          return {
+            connected: false,
+            reason: "S와 E 칸에는 반드시 돌을 놓아야 합니다."
+          };
+        }
+
+        const result = computeShortestPath(stones, start, end);
+        if (result === null) {
+          return {
+            connected: false,
+            reason: "S부터 E까지 돌이 상하좌우로 끊기지 않고 연결되어 있지 않습니다."
+          };
+        }
+
+        return { connected: true, reason: null };
+      }
+
+      function countStones(stones) {
+        let count = 0;
+        for (let r = 0; r < GRID_SIZE; r++) {
+          for (let c = 0; c < GRID_SIZE; c++) {
+            if (stones[r][c]) count++;
+          }
+        }
+        return count;
+      }
+
+      /**
+       * Evaluates all 3 win conditions:
+       * 1. Every placed stone satisfies checkEnvironmentAt(terrain, r, c)
+       * 2. S and E have stones and are 4-directionally connected via stones
+       * 3. Actual stone count === minStones
+       */
+      function evaluateSolution(state) {
+        const { terrain, stones, start, end, minStones } = state;
+        const invalidStones = [];
+
+        for (let r = 0; r < GRID_SIZE; r++) {
+          for (let c = 0; c < GRID_SIZE; c++) {
+            if (stones[r][c] && !checkEnvironmentAt(terrain, r, c)) {
+              invalidStones.push({ r, c });
+            }
+          }
+        }
+
+        const currentCount = countStones(stones);
+        const envOk = invalidStones.length === 0;
+        const connResult = checkConnection(stones, start, end);
+        const countOk = currentCount === minStones;
+
+        const failures = [];
+        if (!envOk) {
+          failures.push(
+            `환경 조건 불충족: 주변 8칸에 용암과 물이 모두 없는 돌이 ${invalidStones.length}개 있습니다.`
+          );
+        }
+        if (!connResult.connected) {
+          failures.push(`연결 조건 불충족: ${connResult.reason}`);
+        }
+        if (!countOk) {
+          failures.push(
+            `최소 돌 개수 불일치: 현재 ${currentCount}개 / 목표 최소 개수 ${minStones}개입니다.`
+          );
+        }
+
+        return {
+          success: envOk && connResult.connected && countOk,
+          envOk,
+          connOk: connResult.connected,
+          countOk,
+          currentCount,
+          minStones,
+          invalidStones,
+          failures
+        };
+      }
+
+      function generateRandomTerrain(rng) {
+        const terrain = Array.from({ length: GRID_SIZE }, () =>
+          Array(GRID_SIZE).fill(TERRAIN_TYPES.EMPTY)
+        );
+        for (let r = 0; r < GRID_SIZE; r++) {
+          for (let c = 0; c < GRID_SIZE; c++) {
+            const roll = rng();
+            if (roll < 0.28) terrain[r][c] = TERRAIN_TYPES.LAVA;
+            else if (roll < 0.56) terrain[r][c] = TERRAIN_TYPES.WATER;
+            else terrain[r][c] = TERRAIN_TYPES.EMPTY;
+          }
+        }
+        return terrain;
+      }
+
+      function verifyPuzzleSolvable(terrain, start, end, minStones) {
+        if (start.r === end.r && start.c === end.c) return false;
+        const validGrid = computeValidPlacementGrid(terrain);
+        const shortest = computeShortestPath(validGrid, start, end);
+        if (!shortest || shortest.minStones !== minStones) return false;
+
+        const testStones = createEmptyBooleanGrid();
+        for (const cell of shortest.path) {
+          testStones[cell.r][cell.c] = true;
+        }
+        const evalResult = evaluateSolution({
+          terrain,
+          stones: testStones,
+          start,
+          end,
+          minStones
+        });
+        return evalResult.success;
+      }
+
+      /**
+       * Generates a guaranteed-solvable 10x10 puzzle:
+       * 1. Places lava, water, empty cells
+       * 2. Computes valid stone-placeable cells
+       * 3. Finds connected components of valid cells
+       * 4. Picks distinct S and E within a connected component
+       * 5. Computes minStones via BFS and verifies full solvability
+       */
+      function createPuzzle(rng = Math.random) {
+        for (let attempt = 0; attempt < 200; attempt++) {
+          const terrain = generateRandomTerrain(rng);
+          const validGrid = computeValidPlacementGrid(terrain);
+          const components = findValidComponents(validGrid).filter((c) => c.length >= 4);
+
+          if (components.length === 0) continue;
+
+          // Prefer larger components for richer paths
+          components.sort((a, b) => b.length - a.length);
+          const topPool = components.slice(0, Math.min(2, components.length));
+          const comp = topPool[Math.floor(rng() * topPool.length)];
+
+          // Sample candidate (S, E) pairs in the chosen component
+          let bestCandidate = null;
+          const tries = Math.min(25, comp.length * 2);
+          for (let t = 0; t < tries; t++) {
+            const idxA = Math.floor(rng() * comp.length);
+            let idxB = Math.floor(rng() * comp.length);
+            if (idxA === idxB) idxB = (idxA + 1) % comp.length;
+
+            const start = comp[idxA];
+            const end = comp[idxB];
+            const shortest = computeShortestPath(validGrid, start, end);
+            if (!shortest) continue;
+
+            if (shortest.minStones >= 5) {
+              bestCandidate = { start, end, minStones: shortest.minStones };
+              break;
+            }
+            if (!bestCandidate || shortest.minStones > bestCandidate.minStones) {
+              bestCandidate = { start, end, minStones: shortest.minStones };
+            }
+          }
+
+          if (
+            bestCandidate &&
+            bestCandidate.minStones >= 3 &&
+            verifyPuzzleSolvable(terrain, bestCandidate.start, bestCandidate.end, bestCandidate.minStones)
+          ) {
+            return {
+              terrain,
+              stones: createEmptyBooleanGrid(),
+              validGrid,
+              start: bestCandidate.start,
+              end: bestCandidate.end,
+              minStones: bestCandidate.minStones
+            };
+          }
+        }
+
+        // Deterministic fallback guaranteed solvable
+        const fallbackTerrain = Array.from({ length: GRID_SIZE }, () =>
+          Array(GRID_SIZE).fill(TERRAIN_TYPES.EMPTY)
+        );
+        for (let c = 0; c < GRID_SIZE; c++) {
+          fallbackTerrain[3][c] = TERRAIN_TYPES.LAVA;
+          fallbackTerrain[5][c] = TERRAIN_TYPES.WATER;
+        }
+        const validGrid = computeValidPlacementGrid(fallbackTerrain);
+        const start = { r: 4, c: 1 };
+        const end = { r: 4, c: 8 };
+        const shortest = computeShortestPath(validGrid, start, end);
+        return {
+          terrain: fallbackTerrain,
+          stones: createEmptyBooleanGrid(),
+          validGrid,
+          start,
+          end,
+          minStones: shortest.minStones
+        };
+      }
+
+      const PuzzleCore = {
+        GRID_SIZE,
+        TERRAIN_TYPES,
+        createEmptyBooleanGrid,
+        checkEnvironmentAt,
+        computeValidPlacementGrid,
+        findValidComponents,
+        computeShortestPath,
+        checkConnection,
+        countStones,
+        evaluateSolution,
+        verifyPuzzleSolvable,
+        createPuzzle
+      };
+
+      // Export for Node.js testing when running outside browser DOM
+      if (typeof module !== "undefined" && module.exports) {
+        module.exports = PuzzleCore;
+      }
+
+      // Browser UI controller
+      if (typeof document !== "undefined") {
+        let gameState = createPuzzle();
+        let showHints = false;
+        let lastInvalidSet = new Set();
+
+        const boardEl = document.getElementById("board");
+        const currentStonesEl = document.getElementById("current-stones");
+        const minStonesEl = document.getElementById("min-stones");
+        const messageBoxEl = document.getElementById("message-box");
+        const btnCheck = document.getElementById("btn-check");
+        const btnReset = document.getElementById("btn-reset");
+        const btnNew = document.getElementById("btn-new");
+        const btnHint = document.getElementById("btn-hint");
+
+        function clearMessage() {
+          messageBoxEl.className = "message-box";
+          messageBoxEl.innerHTML = "";
+          lastInvalidSet = new Set();
+        }
+
+        function showResultMessage(evalResult) {
+          if (evalResult.success) {
+            messageBoxEl.className = "message-box show success";
+            messageBoxEl.innerHTML =
+              '<div class="message-title">성공! 퍼즐을 해결했습니다.</div>' +
+              `<div>환경 조건, 상하좌우 연결 조건, 최소 돌 개수(${evalResult.minStones}개)를 모두 만족했습니다.</div>`;
+          } else {
+            messageBoxEl.className = "message-box show error";
+            const items = evalResult.failures.map((msg) => `<li>${msg}</li>`).join("");
+            messageBoxEl.innerHTML =
+              '<div class="message-title">실패 — 다음 조건을 확인하세요:</div>' +
+              `<ul class="message-list">${items}</ul>`;
+          }
+        }
+
+        function updateStats() {
+          const current = countStones(gameState.stones);
+          currentStonesEl.textContent = String(current);
+          minStonesEl.textContent = String(gameState.minStones);
+
+          currentStonesEl.className = "stat-value";
+          if (current === gameState.minStones) currentStonesEl.classList.add("match");
+          else if (current > gameState.minStones) currentStonesEl.classList.add("over");
+        }
+
+        function renderBoard() {
+          boardEl.innerHTML = "";
+          const { terrain, stones, validGrid, start, end } = gameState;
+
+          for (let r = 0; r < GRID_SIZE; r++) {
+            for (let c = 0; c < GRID_SIZE; c++) {
+              const cell = document.createElement("div");
+              cell.className = `cell terrain-${terrain[r][c]}`;
+              cell.dataset.row = String(r);
+              cell.dataset.col = String(c);
+              cell.setAttribute("role", "gridcell");
+
+              if (stones[r][c]) {
+                cell.classList.add("has-stone");
+              }
+              if (lastInvalidSet.has(`${r},${c}`)) {
+                cell.classList.add("invalid-stone");
+              }
+              if (showHints && validGrid[r][c]) {
+                cell.classList.add("hint-valid");
+              }
+
+              if (r === start.r && c === start.c) {
+                const badge = document.createElement("span");
+                badge.className = "marker marker-start";
+                badge.textContent = "S";
+                cell.appendChild(badge);
+              } else if (r === end.r && c === end.c) {
+                const badge = document.createElement("span");
+                badge.className = "marker marker-end";
+                badge.textContent = "E";
+                cell.appendChild(badge);
+              }
+
+              boardEl.appendChild(cell);
+            }
+          }
+          updateStats();
+        }
+
+        boardEl.addEventListener("click", (event) => {
+          const cellEl = event.target.closest(".cell");
+          if (!cellEl) return;
+
+          const r = Number(cellEl.dataset.row);
+          const c = Number(cellEl.dataset.col);
+
+          // Toggle stone only; terrain[r][c] is never modified
+          gameState.stones[r][c] = !gameState.stones[r][c];
+          clearMessage();
+          renderBoard();
+        });
+
+        btnCheck.addEventListener("click", () => {
+          const evalResult = evaluateSolution(gameState);
+          lastInvalidSet = new Set(evalResult.invalidStones.map((p) => `${p.r},${p.c}`));
+          renderBoard();
+          showResultMessage(evalResult);
+        });
+
+        btnReset.addEventListener("click", () => {
+          gameState.stones = createEmptyBooleanGrid();
+          clearMessage();
+          renderBoard();
+        });
+
+        btnNew.addEventListener("click", () => {
+          gameState = createPuzzle();
+          clearMessage();
+          renderBoard();
+        });
+
+        btnHint.addEventListener("click", () => {
+          showHints = !showHints;
+          btnHint.classList.toggle("toggle-active", showHints);
+          renderBoard();
+        });
+
+        renderBoard();
+      }
+    })(typeof window !== "undefined" ? window : globalThis);
+  </script>
+</body>
+</html>
