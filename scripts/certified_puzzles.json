@@ -1,0 +1,2319 @@
+[
+  {
+    "start": "합정",
+    "end": "노량진",
+    "path": [
+      "합정",
+      "당산",
+      "영등포구청",
+      "문래",
+      "신도림",
+      "영등포",
+      "신길",
+      "대방",
+      "노량진"
+    ],
+    "path_length": 9,
+    "line_sequence": [
+      "2호선",
+      "1호선"
+    ],
+    "transfers": 1,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "transfer_count",
+        1
+      ],
+      [
+        "via_station",
+        "영등포구청"
+      ]
+    ],
+    "competing_paths": 9
+  },
+  {
+    "start": "합정",
+    "end": "노량진",
+    "path": [
+      "합정",
+      "당산",
+      "영등포구청",
+      "문래",
+      "신도림",
+      "영등포",
+      "신길",
+      "여의도",
+      "샛강",
+      "노량진"
+    ],
+    "path_length": 10,
+    "line_sequence": [
+      "2호선",
+      "1호선",
+      "5호선",
+      "9호선"
+    ],
+    "transfers": 3,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        10
+      ],
+      [
+        "transfer_count",
+        3
+      ]
+    ],
+    "competing_paths": 9
+  },
+  {
+    "start": "합정",
+    "end": "노량진",
+    "path": [
+      "합정",
+      "당산",
+      "영등포구청",
+      "신길",
+      "대방",
+      "노량진"
+    ],
+    "path_length": 6,
+    "line_sequence": [
+      "2호선",
+      "5호선",
+      "1호선"
+    ],
+    "transfers": 2,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        6
+      ],
+      [
+        "transfer_count",
+        2
+      ]
+    ],
+    "competing_paths": 9
+  },
+  {
+    "start": "합정",
+    "end": "노량진",
+    "path": [
+      "합정",
+      "당산",
+      "영등포구청",
+      "신길",
+      "여의도",
+      "샛강",
+      "노량진"
+    ],
+    "path_length": 7,
+    "line_sequence": [
+      "2호선",
+      "5호선",
+      "9호선"
+    ],
+    "transfers": 2,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        7
+      ],
+      [
+        "transfer_count",
+        2
+      ]
+    ],
+    "competing_paths": 9
+  },
+  {
+    "start": "합정",
+    "end": "노량진",
+    "path": [
+      "합정",
+      "당산",
+      "국회의사당",
+      "여의도",
+      "신길",
+      "대방",
+      "노량진"
+    ],
+    "path_length": 7,
+    "line_sequence": [
+      "2호선",
+      "9호선",
+      "5호선",
+      "1호선"
+    ],
+    "transfers": 3,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        7
+      ],
+      [
+        "transfer_count",
+        3
+      ]
+    ],
+    "competing_paths": 9
+  },
+  {
+    "start": "합정",
+    "end": "노량진",
+    "path": [
+      "합정",
+      "당산",
+      "국회의사당",
+      "여의도",
+      "샛강",
+      "노량진"
+    ],
+    "path_length": 6,
+    "line_sequence": [
+      "2호선",
+      "9호선"
+    ],
+    "transfers": 1,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        6
+      ],
+      [
+        "transfer_count",
+        1
+      ]
+    ],
+    "competing_paths": 9
+  },
+  {
+    "start": "합정",
+    "end": "노량진",
+    "path": [
+      "합정",
+      "홍대입구",
+      "신촌",
+      "이대",
+      "아현",
+      "충정로",
+      "시청",
+      "서울역",
+      "남영",
+      "용산",
+      "노량진"
+    ],
+    "path_length": 11,
+    "line_sequence": [
+      "2호선",
+      "1호선"
+    ],
+    "transfers": 1,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        11
+      ],
+      [
+        "transfer_count",
+        1
+      ]
+    ],
+    "competing_paths": 9
+  },
+  {
+    "start": "합정",
+    "end": "노량진",
+    "path": [
+      "합정",
+      "상수",
+      "광흥창",
+      "대흥",
+      "공덕",
+      "마포",
+      "여의나루",
+      "여의도",
+      "신길",
+      "대방",
+      "노량진"
+    ],
+    "path_length": 11,
+    "line_sequence": [
+      "6호선",
+      "5호선",
+      "1호선"
+    ],
+    "transfers": 2,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        11
+      ],
+      [
+        "transfer_count",
+        2
+      ]
+    ],
+    "competing_paths": 9
+  },
+  {
+    "start": "합정",
+    "end": "노량진",
+    "path": [
+      "합정",
+      "상수",
+      "광흥창",
+      "대흥",
+      "공덕",
+      "마포",
+      "여의나루",
+      "여의도",
+      "샛강",
+      "노량진"
+    ],
+    "path_length": 10,
+    "line_sequence": [
+      "6호선",
+      "5호선",
+      "9호선"
+    ],
+    "transfers": 2,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        10
+      ],
+      [
+        "transfer_count",
+        2
+      ]
+    ],
+    "competing_paths": 9
+  },
+  {
+    "start": "홍대입구",
+    "end": "여의도",
+    "path": [
+      "홍대입구",
+      "합정",
+      "당산",
+      "영등포구청",
+      "문래",
+      "신도림",
+      "영등포",
+      "신길",
+      "여의도"
+    ],
+    "path_length": 9,
+    "line_sequence": [
+      "2호선",
+      "1호선",
+      "5호선"
+    ],
+    "transfers": 2,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "transfer_count",
+        2
+      ],
+      [
+        "via_station",
+        "당산"
+      ]
+    ],
+    "competing_paths": 6
+  },
+  {
+    "start": "홍대입구",
+    "end": "여의도",
+    "path": [
+      "홍대입구",
+      "합정",
+      "당산",
+      "영등포구청",
+      "신길",
+      "대방",
+      "노량진",
+      "샛강",
+      "여의도"
+    ],
+    "path_length": 9,
+    "line_sequence": [
+      "2호선",
+      "5호선",
+      "1호선",
+      "9호선"
+    ],
+    "transfers": 3,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        9
+      ],
+      [
+        "via_station",
+        "당산"
+      ],
+      [
+        "avoid_station",
+        "신도림"
+      ]
+    ],
+    "competing_paths": 6
+  },
+  {
+    "start": "홍대입구",
+    "end": "여의도",
+    "path": [
+      "홍대입구",
+      "합정",
+      "당산",
+      "영등포구청",
+      "신길",
+      "여의도"
+    ],
+    "path_length": 6,
+    "line_sequence": [
+      "2호선",
+      "5호선"
+    ],
+    "transfers": 1,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "transfer_count",
+        1
+      ],
+      [
+        "via_station",
+        "영등포구청"
+      ]
+    ],
+    "competing_paths": 6
+  },
+  {
+    "start": "홍대입구",
+    "end": "여의도",
+    "path": [
+      "홍대입구",
+      "합정",
+      "당산",
+      "국회의사당",
+      "여의도"
+    ],
+    "path_length": 5,
+    "line_sequence": [
+      "2호선",
+      "9호선"
+    ],
+    "transfers": 1,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "via_station",
+        "당산"
+      ],
+      [
+        "avoid_station",
+        "영등포구청"
+      ]
+    ],
+    "competing_paths": 6
+  },
+  {
+    "start": "홍대입구",
+    "end": "여의도",
+    "path": [
+      "홍대입구",
+      "합정",
+      "상수",
+      "광흥창",
+      "대흥",
+      "공덕",
+      "마포",
+      "여의나루",
+      "여의도"
+    ],
+    "path_length": 9,
+    "line_sequence": [
+      "2호선",
+      "6호선",
+      "5호선"
+    ],
+    "transfers": 2,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        9
+      ],
+      [
+        "via_station",
+        "공덕"
+      ]
+    ],
+    "competing_paths": 6
+  },
+  {
+    "start": "홍대입구",
+    "end": "여의도",
+    "path": [
+      "홍대입구",
+      "신촌",
+      "이대",
+      "아현",
+      "충정로",
+      "애오개",
+      "공덕",
+      "마포",
+      "여의나루",
+      "여의도"
+    ],
+    "path_length": 10,
+    "line_sequence": [
+      "2호선",
+      "5호선"
+    ],
+    "transfers": 1,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "transfer_count",
+        1
+      ],
+      [
+        "via_station",
+        "공덕"
+      ]
+    ],
+    "competing_paths": 6
+  },
+  {
+    "start": "시청",
+    "end": "고속터미널",
+    "path": [
+      "시청",
+      "서울역",
+      "남영",
+      "용산",
+      "노량진",
+      "노들",
+      "흑석",
+      "동작",
+      "총신대입구",
+      "내방",
+      "고속터미널"
+    ],
+    "path_length": 11,
+    "line_sequence": [
+      "1호선",
+      "9호선",
+      "4호선",
+      "7호선"
+    ],
+    "transfers": 3,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        11
+      ],
+      [
+        "via_station",
+        "총신대입구"
+      ]
+    ],
+    "competing_paths": 7
+  },
+  {
+    "start": "시청",
+    "end": "고속터미널",
+    "path": [
+      "시청",
+      "서울역",
+      "남영",
+      "용산",
+      "노량진",
+      "노들",
+      "흑석",
+      "동작",
+      "구반포",
+      "신반포",
+      "고속터미널"
+    ],
+    "path_length": 11,
+    "line_sequence": [
+      "1호선",
+      "9호선"
+    ],
+    "transfers": 1,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        11
+      ],
+      [
+        "transfer_count",
+        1
+      ]
+    ],
+    "competing_paths": 7
+  },
+  {
+    "start": "시청",
+    "end": "고속터미널",
+    "path": [
+      "시청",
+      "서울역",
+      "숙대입구",
+      "삼각지",
+      "신용산",
+      "이촌",
+      "동작",
+      "총신대입구",
+      "내방",
+      "고속터미널"
+    ],
+    "path_length": 10,
+    "line_sequence": [
+      "1호선",
+      "4호선",
+      "7호선"
+    ],
+    "transfers": 2,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        10
+      ],
+      [
+        "via_station",
+        "총신대입구"
+      ]
+    ],
+    "competing_paths": 7
+  },
+  {
+    "start": "시청",
+    "end": "고속터미널",
+    "path": [
+      "시청",
+      "을지로입구",
+      "을지로3가",
+      "충무로",
+      "동대입구",
+      "약수",
+      "금호",
+      "옥수",
+      "압구정",
+      "신사",
+      "잠원",
+      "고속터미널"
+    ],
+    "path_length": 12,
+    "line_sequence": [
+      "2호선",
+      "3호선"
+    ],
+    "transfers": 1,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        12
+      ],
+      [
+        "transfer_count",
+        1
+      ]
+    ],
+    "competing_paths": 7
+  },
+  {
+    "start": "시청",
+    "end": "고속터미널",
+    "path": [
+      "시청",
+      "충정로",
+      "애오개",
+      "공덕",
+      "효창공원앞",
+      "삼각지",
+      "신용산",
+      "이촌",
+      "동작",
+      "총신대입구",
+      "내방",
+      "고속터미널"
+    ],
+    "path_length": 12,
+    "line_sequence": [
+      "2호선",
+      "5호선",
+      "6호선",
+      "4호선",
+      "7호선"
+    ],
+    "transfers": 4,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        12
+      ],
+      [
+        "via_station",
+        "총신대입구"
+      ]
+    ],
+    "competing_paths": 7
+  },
+  {
+    "start": "을지로3가",
+    "end": "여의도",
+    "path": [
+      "을지로3가",
+      "을지로입구",
+      "시청",
+      "서울역",
+      "남영",
+      "용산",
+      "노량진",
+      "대방",
+      "신길",
+      "여의도"
+    ],
+    "path_length": 10,
+    "line_sequence": [
+      "2호선",
+      "1호선",
+      "5호선"
+    ],
+    "transfers": 2,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        10
+      ],
+      [
+        "via_station",
+        "신길"
+      ]
+    ],
+    "competing_paths": 13
+  },
+  {
+    "start": "을지로3가",
+    "end": "여의도",
+    "path": [
+      "을지로3가",
+      "을지로입구",
+      "시청",
+      "서울역",
+      "남영",
+      "용산",
+      "노량진",
+      "샛강",
+      "여의도"
+    ],
+    "path_length": 9,
+    "line_sequence": [
+      "2호선",
+      "1호선",
+      "9호선"
+    ],
+    "transfers": 2,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        9
+      ],
+      [
+        "transfer_count",
+        2
+      ]
+    ],
+    "competing_paths": 13
+  },
+  {
+    "start": "을지로3가",
+    "end": "여의도",
+    "path": [
+      "을지로3가",
+      "을지로입구",
+      "시청",
+      "서울역",
+      "숙대입구",
+      "삼각지",
+      "효창공원앞",
+      "공덕",
+      "마포",
+      "여의나루",
+      "여의도"
+    ],
+    "path_length": 11,
+    "line_sequence": [
+      "2호선",
+      "1호선",
+      "4호선",
+      "6호선",
+      "5호선"
+    ],
+    "transfers": 4,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "transfer_count",
+        4
+      ],
+      [
+        "via_station",
+        "서울역"
+      ]
+    ],
+    "competing_paths": 13
+  },
+  {
+    "start": "을지로3가",
+    "end": "여의도",
+    "path": [
+      "을지로3가",
+      "을지로입구",
+      "시청",
+      "충정로",
+      "애오개",
+      "공덕",
+      "마포",
+      "여의나루",
+      "여의도"
+    ],
+    "path_length": 9,
+    "line_sequence": [
+      "2호선",
+      "5호선"
+    ],
+    "transfers": 1,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        9
+      ],
+      [
+        "transfer_count",
+        1
+      ]
+    ],
+    "competing_paths": 13
+  },
+  {
+    "start": "을지로3가",
+    "end": "여의도",
+    "path": [
+      "을지로3가",
+      "을지로4가",
+      "종로3가",
+      "종각",
+      "시청",
+      "서울역",
+      "남영",
+      "용산",
+      "노량진",
+      "샛강",
+      "여의도"
+    ],
+    "path_length": 11,
+    "line_sequence": [
+      "2호선",
+      "5호선",
+      "1호선",
+      "9호선"
+    ],
+    "transfers": 3,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "transfer_count",
+        3
+      ],
+      [
+        "via_station",
+        "을지로4가"
+      ]
+    ],
+    "competing_paths": 13
+  },
+  {
+    "start": "을지로3가",
+    "end": "여의도",
+    "path": [
+      "을지로3가",
+      "을지로4가",
+      "종로3가",
+      "종각",
+      "시청",
+      "충정로",
+      "애오개",
+      "공덕",
+      "마포",
+      "여의나루",
+      "여의도"
+    ],
+    "path_length": 11,
+    "line_sequence": [
+      "2호선",
+      "5호선",
+      "1호선",
+      "2호선",
+      "5호선"
+    ],
+    "transfers": 4,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "transfer_count",
+        4
+      ],
+      [
+        "via_station",
+        "을지로4가"
+      ]
+    ],
+    "competing_paths": 13
+  },
+  {
+    "start": "을지로3가",
+    "end": "여의도",
+    "path": [
+      "을지로3가",
+      "을지로4가",
+      "종로3가",
+      "광화문",
+      "서대문",
+      "충정로",
+      "애오개",
+      "공덕",
+      "마포",
+      "여의나루",
+      "여의도"
+    ],
+    "path_length": 11,
+    "line_sequence": [
+      "2호선",
+      "5호선"
+    ],
+    "transfers": 1,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        11
+      ],
+      [
+        "transfer_count",
+        1
+      ]
+    ],
+    "competing_paths": 13
+  },
+  {
+    "start": "을지로3가",
+    "end": "여의도",
+    "path": [
+      "을지로3가",
+      "종로3가",
+      "종각",
+      "시청",
+      "서울역",
+      "남영",
+      "용산",
+      "노량진",
+      "대방",
+      "신길",
+      "여의도"
+    ],
+    "path_length": 11,
+    "line_sequence": [
+      "3호선",
+      "1호선",
+      "5호선"
+    ],
+    "transfers": 2,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        11
+      ],
+      [
+        "transfer_count",
+        2
+      ]
+    ],
+    "competing_paths": 13
+  },
+  {
+    "start": "을지로3가",
+    "end": "여의도",
+    "path": [
+      "을지로3가",
+      "종로3가",
+      "종각",
+      "시청",
+      "서울역",
+      "남영",
+      "용산",
+      "노량진",
+      "샛강",
+      "여의도"
+    ],
+    "path_length": 10,
+    "line_sequence": [
+      "3호선",
+      "1호선",
+      "9호선"
+    ],
+    "transfers": 2,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        10
+      ],
+      [
+        "transfer_count",
+        2
+      ],
+      [
+        "via_station",
+        "종로3가"
+      ]
+    ],
+    "competing_paths": 13
+  },
+  {
+    "start": "을지로3가",
+    "end": "여의도",
+    "path": [
+      "을지로3가",
+      "종로3가",
+      "종각",
+      "시청",
+      "충정로",
+      "애오개",
+      "공덕",
+      "마포",
+      "여의나루",
+      "여의도"
+    ],
+    "path_length": 10,
+    "line_sequence": [
+      "3호선",
+      "1호선",
+      "2호선",
+      "5호선"
+    ],
+    "transfers": 3,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "transfer_count",
+        3
+      ],
+      [
+        "via_station",
+        "충정로"
+      ]
+    ],
+    "competing_paths": 13
+  },
+  {
+    "start": "을지로3가",
+    "end": "여의도",
+    "path": [
+      "을지로3가",
+      "종로3가",
+      "광화문",
+      "서대문",
+      "충정로",
+      "애오개",
+      "공덕",
+      "마포",
+      "여의나루",
+      "여의도"
+    ],
+    "path_length": 10,
+    "line_sequence": [
+      "3호선",
+      "5호선"
+    ],
+    "transfers": 1,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        10
+      ],
+      [
+        "transfer_count",
+        1
+      ]
+    ],
+    "competing_paths": 13
+  },
+  {
+    "start": "을지로3가",
+    "end": "여의도",
+    "path": [
+      "을지로3가",
+      "충무로",
+      "명동",
+      "회현",
+      "서울역",
+      "남영",
+      "용산",
+      "노량진",
+      "대방",
+      "신길",
+      "여의도"
+    ],
+    "path_length": 11,
+    "line_sequence": [
+      "3호선",
+      "4호선",
+      "1호선",
+      "5호선"
+    ],
+    "transfers": 3,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        11
+      ],
+      [
+        "via_station",
+        "충무로"
+      ]
+    ],
+    "competing_paths": 13
+  },
+  {
+    "start": "을지로3가",
+    "end": "여의도",
+    "path": [
+      "을지로3가",
+      "충무로",
+      "명동",
+      "회현",
+      "서울역",
+      "남영",
+      "용산",
+      "노량진",
+      "샛강",
+      "여의도"
+    ],
+    "path_length": 10,
+    "line_sequence": [
+      "3호선",
+      "4호선",
+      "1호선",
+      "9호선"
+    ],
+    "transfers": 3,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        10
+      ],
+      [
+        "via_station",
+        "충무로"
+      ]
+    ],
+    "competing_paths": 13
+  },
+  {
+    "start": "동대문",
+    "end": "강남",
+    "path": [
+      "동대문",
+      "동대문역사문화공원",
+      "신당",
+      "청구",
+      "약수",
+      "금호",
+      "옥수",
+      "압구정",
+      "신사",
+      "잠원",
+      "고속터미널",
+      "교대",
+      "강남"
+    ],
+    "path_length": 13,
+    "line_sequence": [
+      "4호선",
+      "2호선",
+      "6호선",
+      "3호선",
+      "2호선"
+    ],
+    "transfers": 4,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        13
+      ],
+      [
+        "transfer_count",
+        4
+      ]
+    ],
+    "competing_paths": 3
+  },
+  {
+    "start": "동대문",
+    "end": "강남",
+    "path": [
+      "동대문",
+      "동대문역사문화공원",
+      "충무로",
+      "동대입구",
+      "약수",
+      "금호",
+      "옥수",
+      "압구정",
+      "신사",
+      "잠원",
+      "고속터미널",
+      "교대",
+      "강남"
+    ],
+    "path_length": 13,
+    "line_sequence": [
+      "4호선",
+      "3호선",
+      "2호선"
+    ],
+    "transfers": 2,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        13
+      ],
+      [
+        "avoid_station",
+        "신당"
+      ]
+    ],
+    "competing_paths": 3
+  },
+  {
+    "start": "동대문",
+    "end": "강남",
+    "path": [
+      "동대문",
+      "동대문역사문화공원",
+      "청구",
+      "약수",
+      "금호",
+      "옥수",
+      "압구정",
+      "신사",
+      "잠원",
+      "고속터미널",
+      "교대",
+      "강남"
+    ],
+    "path_length": 12,
+    "line_sequence": [
+      "4호선",
+      "5호선",
+      "6호선",
+      "3호선",
+      "2호선"
+    ],
+    "transfers": 4,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "transfer_count",
+        4
+      ],
+      [
+        "avoid_station",
+        "신당"
+      ]
+    ],
+    "competing_paths": 3
+  },
+  {
+    "start": "신도림",
+    "end": "삼각지",
+    "path": [
+      "신도림",
+      "영등포",
+      "신길",
+      "대방",
+      "노량진",
+      "용산",
+      "남영",
+      "서울역",
+      "숙대입구",
+      "삼각지"
+    ],
+    "path_length": 10,
+    "line_sequence": [
+      "1호선",
+      "4호선"
+    ],
+    "transfers": 1,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        10
+      ],
+      [
+        "transfer_count",
+        1
+      ]
+    ],
+    "competing_paths": 8
+  },
+  {
+    "start": "신도림",
+    "end": "삼각지",
+    "path": [
+      "신도림",
+      "영등포",
+      "신길",
+      "대방",
+      "노량진",
+      "노들",
+      "흑석",
+      "동작",
+      "이촌",
+      "신용산",
+      "삼각지"
+    ],
+    "path_length": 11,
+    "line_sequence": [
+      "1호선",
+      "9호선",
+      "4호선"
+    ],
+    "transfers": 2,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        11
+      ],
+      [
+        "transfer_count",
+        2
+      ]
+    ],
+    "competing_paths": 8
+  },
+  {
+    "start": "신도림",
+    "end": "삼각지",
+    "path": [
+      "신도림",
+      "영등포",
+      "신길",
+      "여의도",
+      "여의나루",
+      "마포",
+      "공덕",
+      "효창공원앞",
+      "삼각지"
+    ],
+    "path_length": 9,
+    "line_sequence": [
+      "1호선",
+      "5호선",
+      "6호선"
+    ],
+    "transfers": 2,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "via_station",
+        "공덕"
+      ],
+      [
+        "avoid_station",
+        "문래"
+      ]
+    ],
+    "competing_paths": 8
+  },
+  {
+    "start": "신도림",
+    "end": "삼각지",
+    "path": [
+      "신도림",
+      "영등포",
+      "신길",
+      "여의도",
+      "샛강",
+      "노량진",
+      "용산",
+      "남영",
+      "서울역",
+      "숙대입구",
+      "삼각지"
+    ],
+    "path_length": 11,
+    "line_sequence": [
+      "1호선",
+      "5호선",
+      "9호선",
+      "1호선",
+      "4호선"
+    ],
+    "transfers": 4,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "via_station",
+        "여의도"
+      ],
+      [
+        "via_station",
+        "노량진"
+      ]
+    ],
+    "competing_paths": 8
+  },
+  {
+    "start": "신도림",
+    "end": "삼각지",
+    "path": [
+      "신도림",
+      "문래",
+      "영등포구청",
+      "당산",
+      "합정",
+      "상수",
+      "광흥창",
+      "대흥",
+      "공덕",
+      "효창공원앞",
+      "삼각지"
+    ],
+    "path_length": 11,
+    "line_sequence": [
+      "2호선",
+      "6호선"
+    ],
+    "transfers": 1,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        11
+      ],
+      [
+        "transfer_count",
+        1
+      ]
+    ],
+    "competing_paths": 8
+  },
+  {
+    "start": "신도림",
+    "end": "삼각지",
+    "path": [
+      "신도림",
+      "문래",
+      "영등포구청",
+      "당산",
+      "국회의사당",
+      "여의도",
+      "여의나루",
+      "마포",
+      "공덕",
+      "효창공원앞",
+      "삼각지"
+    ],
+    "path_length": 11,
+    "line_sequence": [
+      "2호선",
+      "9호선",
+      "5호선",
+      "6호선"
+    ],
+    "transfers": 3,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "transfer_count",
+        3
+      ],
+      [
+        "via_station",
+        "당산"
+      ]
+    ],
+    "competing_paths": 8
+  },
+  {
+    "start": "신도림",
+    "end": "삼각지",
+    "path": [
+      "신도림",
+      "문래",
+      "영등포구청",
+      "신길",
+      "대방",
+      "노량진",
+      "용산",
+      "남영",
+      "서울역",
+      "숙대입구",
+      "삼각지"
+    ],
+    "path_length": 11,
+    "line_sequence": [
+      "2호선",
+      "5호선",
+      "1호선",
+      "4호선"
+    ],
+    "transfers": 3,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "transfer_count",
+        3
+      ],
+      [
+        "via_station",
+        "신길"
+      ]
+    ],
+    "competing_paths": 8
+  },
+  {
+    "start": "신도림",
+    "end": "삼각지",
+    "path": [
+      "신도림",
+      "문래",
+      "영등포구청",
+      "신길",
+      "여의도",
+      "여의나루",
+      "마포",
+      "공덕",
+      "효창공원앞",
+      "삼각지"
+    ],
+    "path_length": 10,
+    "line_sequence": [
+      "2호선",
+      "5호선",
+      "6호선"
+    ],
+    "transfers": 2,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        10
+      ],
+      [
+        "transfer_count",
+        2
+      ]
+    ],
+    "competing_paths": 8
+  },
+  {
+    "start": "용산",
+    "end": "강남",
+    "path": [
+      "용산",
+      "노량진",
+      "노들",
+      "흑석",
+      "동작",
+      "총신대입구",
+      "사당",
+      "방배",
+      "서초",
+      "교대",
+      "강남"
+    ],
+    "path_length": 11,
+    "line_sequence": [
+      "1호선",
+      "9호선",
+      "4호선",
+      "2호선"
+    ],
+    "transfers": 3,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "transfer_count",
+        3
+      ],
+      [
+        "via_station",
+        "총신대입구"
+      ]
+    ],
+    "competing_paths": 3
+  },
+  {
+    "start": "용산",
+    "end": "강남",
+    "path": [
+      "용산",
+      "노량진",
+      "노들",
+      "흑석",
+      "동작",
+      "총신대입구",
+      "내방",
+      "고속터미널",
+      "교대",
+      "강남"
+    ],
+    "path_length": 10,
+    "line_sequence": [
+      "1호선",
+      "9호선",
+      "4호선",
+      "7호선",
+      "3호선",
+      "2호선"
+    ],
+    "transfers": 5,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        10
+      ],
+      [
+        "via_station",
+        "총신대입구"
+      ]
+    ],
+    "competing_paths": 3
+  },
+  {
+    "start": "용산",
+    "end": "강남",
+    "path": [
+      "용산",
+      "노량진",
+      "노들",
+      "흑석",
+      "동작",
+      "구반포",
+      "신반포",
+      "고속터미널",
+      "교대",
+      "강남"
+    ],
+    "path_length": 10,
+    "line_sequence": [
+      "1호선",
+      "9호선",
+      "3호선",
+      "2호선"
+    ],
+    "transfers": 3,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        10
+      ],
+      [
+        "transfer_count",
+        3
+      ]
+    ],
+    "competing_paths": 3
+  },
+  {
+    "start": "종각",
+    "end": "여의도",
+    "path": [
+      "종각",
+      "종로3가",
+      "을지로3가",
+      "을지로입구",
+      "시청",
+      "서울역",
+      "남영",
+      "용산",
+      "노량진",
+      "샛강",
+      "여의도"
+    ],
+    "path_length": 11,
+    "line_sequence": [
+      "1호선",
+      "3호선",
+      "2호선",
+      "1호선",
+      "9호선"
+    ],
+    "transfers": 4,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        11
+      ],
+      [
+        "via_station",
+        "서울역"
+      ]
+    ],
+    "competing_paths": 8
+  },
+  {
+    "start": "종각",
+    "end": "여의도",
+    "path": [
+      "종각",
+      "종로3가",
+      "을지로3가",
+      "을지로입구",
+      "시청",
+      "충정로",
+      "애오개",
+      "공덕",
+      "마포",
+      "여의나루",
+      "여의도"
+    ],
+    "path_length": 11,
+    "line_sequence": [
+      "1호선",
+      "3호선",
+      "2호선",
+      "5호선"
+    ],
+    "transfers": 3,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        11
+      ],
+      [
+        "transfer_count",
+        3
+      ]
+    ],
+    "competing_paths": 8
+  },
+  {
+    "start": "종각",
+    "end": "여의도",
+    "path": [
+      "종각",
+      "종로3가",
+      "광화문",
+      "서대문",
+      "충정로",
+      "애오개",
+      "공덕",
+      "마포",
+      "여의나루",
+      "여의도"
+    ],
+    "path_length": 10,
+    "line_sequence": [
+      "1호선",
+      "5호선"
+    ],
+    "transfers": 1,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        10
+      ],
+      [
+        "transfer_count",
+        1
+      ]
+    ],
+    "competing_paths": 8
+  },
+  {
+    "start": "종각",
+    "end": "여의도",
+    "path": [
+      "종각",
+      "시청",
+      "서울역",
+      "남영",
+      "용산",
+      "노량진",
+      "대방",
+      "신길",
+      "여의도"
+    ],
+    "path_length": 9,
+    "line_sequence": [
+      "1호선",
+      "5호선"
+    ],
+    "transfers": 1,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "line_sequence",
+        [
+          "1호선",
+          "5호선"
+        ]
+      ],
+      [
+        "via_station",
+        "시청"
+      ]
+    ],
+    "competing_paths": 8
+  },
+  {
+    "start": "종각",
+    "end": "여의도",
+    "path": [
+      "종각",
+      "시청",
+      "서울역",
+      "남영",
+      "용산",
+      "노량진",
+      "샛강",
+      "여의도"
+    ],
+    "path_length": 8,
+    "line_sequence": [
+      "1호선",
+      "9호선"
+    ],
+    "transfers": 1,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        8
+      ],
+      [
+        "transfer_count",
+        1
+      ]
+    ],
+    "competing_paths": 8
+  },
+  {
+    "start": "종각",
+    "end": "여의도",
+    "path": [
+      "종각",
+      "시청",
+      "서울역",
+      "숙대입구",
+      "삼각지",
+      "효창공원앞",
+      "공덕",
+      "마포",
+      "여의나루",
+      "여의도"
+    ],
+    "path_length": 10,
+    "line_sequence": [
+      "1호선",
+      "4호선",
+      "6호선",
+      "5호선"
+    ],
+    "transfers": 3,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        10
+      ],
+      [
+        "transfer_count",
+        3
+      ]
+    ],
+    "competing_paths": 8
+  },
+  {
+    "start": "종각",
+    "end": "여의도",
+    "path": [
+      "종각",
+      "시청",
+      "충정로",
+      "아현",
+      "이대",
+      "신촌",
+      "홍대입구",
+      "합정",
+      "당산",
+      "국회의사당",
+      "여의도"
+    ],
+    "path_length": 11,
+    "line_sequence": [
+      "1호선",
+      "2호선",
+      "9호선"
+    ],
+    "transfers": 2,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        11
+      ],
+      [
+        "transfer_count",
+        2
+      ]
+    ],
+    "competing_paths": 8
+  },
+  {
+    "start": "종각",
+    "end": "여의도",
+    "path": [
+      "종각",
+      "시청",
+      "충정로",
+      "애오개",
+      "공덕",
+      "마포",
+      "여의나루",
+      "여의도"
+    ],
+    "path_length": 8,
+    "line_sequence": [
+      "1호선",
+      "2호선",
+      "5호선"
+    ],
+    "transfers": 2,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        8
+      ],
+      [
+        "transfer_count",
+        2
+      ]
+    ],
+    "competing_paths": 8
+  },
+  {
+    "start": "사당",
+    "end": "여의도",
+    "path": [
+      "사당",
+      "낙성대",
+      "서울대입구",
+      "봉천",
+      "신림",
+      "신대방",
+      "구로디지털단지",
+      "대림",
+      "신도림",
+      "영등포",
+      "신길",
+      "여의도"
+    ],
+    "path_length": 12,
+    "line_sequence": [
+      "2호선",
+      "1호선",
+      "5호선"
+    ],
+    "transfers": 2,
+    "river_crossings": 0,
+    "clues": [
+      [
+        "total_stations",
+        12
+      ],
+      [
+        "avoid_station",
+        "노량진"
+      ]
+    ],
+    "competing_paths": 6
+  },
+  {
+    "start": "사당",
+    "end": "여의도",
+    "path": [
+      "사당",
+      "총신대입구",
+      "동작",
+      "흑석",
+      "노들",
+      "노량진",
+      "대방",
+      "신길",
+      "영등포구청",
+      "당산",
+      "국회의사당",
+      "여의도"
+    ],
+    "path_length": 12,
+    "line_sequence": [
+      "4호선",
+      "9호선",
+      "1호선",
+      "5호선",
+      "2호선",
+      "9호선"
+    ],
+    "transfers": 5,
+    "river_crossings": 0,
+    "clues": [
+      [
+        "total_stations",
+        12
+      ],
+      [
+        "via_station",
+        "총신대입구"
+      ],
+      [
+        "via_station",
+        "신길"
+      ]
+    ],
+    "competing_paths": 6
+  },
+  {
+    "start": "사당",
+    "end": "여의도",
+    "path": [
+      "사당",
+      "총신대입구",
+      "내방",
+      "고속터미널",
+      "신반포",
+      "구반포",
+      "동작",
+      "흑석",
+      "노들",
+      "노량진",
+      "샛강",
+      "여의도"
+    ],
+    "path_length": 12,
+    "line_sequence": [
+      "4호선",
+      "7호선",
+      "9호선"
+    ],
+    "transfers": 2,
+    "river_crossings": 0,
+    "clues": [
+      [
+        "transfer_count",
+        2
+      ],
+      [
+        "via_station",
+        "노량진"
+      ]
+    ],
+    "competing_paths": 6
+  },
+  {
+    "start": "공덕",
+    "end": "고속터미널",
+    "path": [
+      "공덕",
+      "마포",
+      "여의나루",
+      "여의도",
+      "샛강",
+      "노량진",
+      "노들",
+      "흑석",
+      "동작",
+      "총신대입구",
+      "내방",
+      "고속터미널"
+    ],
+    "path_length": 12,
+    "line_sequence": [
+      "5호선",
+      "9호선",
+      "4호선",
+      "7호선"
+    ],
+    "transfers": 3,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "transfer_count",
+        3
+      ],
+      [
+        "via_station",
+        "여의도"
+      ]
+    ],
+    "competing_paths": 5
+  },
+  {
+    "start": "공덕",
+    "end": "고속터미널",
+    "path": [
+      "공덕",
+      "효창공원앞",
+      "삼각지",
+      "신용산",
+      "이촌",
+      "동작",
+      "총신대입구",
+      "사당",
+      "방배",
+      "서초",
+      "교대",
+      "고속터미널"
+    ],
+    "path_length": 12,
+    "line_sequence": [
+      "6호선",
+      "4호선",
+      "2호선",
+      "3호선"
+    ],
+    "transfers": 3,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        12
+      ],
+      [
+        "via_station",
+        "삼각지"
+      ]
+    ],
+    "competing_paths": 5
+  },
+  {
+    "start": "공덕",
+    "end": "고속터미널",
+    "path": [
+      "공덕",
+      "효창공원앞",
+      "삼각지",
+      "신용산",
+      "이촌",
+      "동작",
+      "총신대입구",
+      "내방",
+      "고속터미널"
+    ],
+    "path_length": 9,
+    "line_sequence": [
+      "6호선",
+      "4호선",
+      "7호선"
+    ],
+    "transfers": 2,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        9
+      ],
+      [
+        "via_station",
+        "총신대입구"
+      ]
+    ],
+    "competing_paths": 5
+  },
+  {
+    "start": "공덕",
+    "end": "고속터미널",
+    "path": [
+      "공덕",
+      "효창공원앞",
+      "삼각지",
+      "신용산",
+      "이촌",
+      "동작",
+      "구반포",
+      "신반포",
+      "고속터미널"
+    ],
+    "path_length": 9,
+    "line_sequence": [
+      "6호선",
+      "4호선",
+      "9호선"
+    ],
+    "transfers": 2,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        9
+      ],
+      [
+        "avoid_station",
+        "총신대입구"
+      ]
+    ],
+    "competing_paths": 5
+  },
+  {
+    "start": "영등포",
+    "end": "충무로",
+    "path": [
+      "영등포",
+      "신길",
+      "대방",
+      "노량진",
+      "용산",
+      "남영",
+      "서울역",
+      "시청",
+      "을지로입구",
+      "을지로3가",
+      "충무로"
+    ],
+    "path_length": 11,
+    "line_sequence": [
+      "1호선",
+      "2호선",
+      "3호선"
+    ],
+    "transfers": 2,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        11
+      ],
+      [
+        "avoid_station",
+        "여의도"
+      ]
+    ],
+    "competing_paths": 3
+  },
+  {
+    "start": "영등포",
+    "end": "충무로",
+    "path": [
+      "영등포",
+      "신길",
+      "대방",
+      "노량진",
+      "용산",
+      "남영",
+      "서울역",
+      "회현",
+      "명동",
+      "충무로"
+    ],
+    "path_length": 10,
+    "line_sequence": [
+      "1호선",
+      "4호선"
+    ],
+    "transfers": 1,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "avoid_station",
+        "시청"
+      ],
+      [
+        "avoid_station",
+        "여의도"
+      ]
+    ],
+    "competing_paths": 3
+  },
+  {
+    "start": "영등포",
+    "end": "충무로",
+    "path": [
+      "영등포",
+      "신길",
+      "여의도",
+      "샛강",
+      "노량진",
+      "용산",
+      "남영",
+      "서울역",
+      "회현",
+      "명동",
+      "충무로"
+    ],
+    "path_length": 11,
+    "line_sequence": [
+      "1호선",
+      "5호선",
+      "9호선",
+      "1호선",
+      "4호선"
+    ],
+    "transfers": 4,
+    "river_crossings": 1,
+    "clues": [
+      [
+        "total_stations",
+        11
+      ],
+      [
+        "avoid_station",
+        "시청"
+      ]
+    ],
+    "competing_paths": 3
+  }
+]
