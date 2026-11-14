@@ -125,7 +125,8 @@
 
     .board {
       display: grid;
-      grid-template-columns: repeat(10, 1fr);
+      grid-template-columns: repeat(10, minmax(0, 1fr));
+      grid-template-rows: repeat(10, minmax(0, 1fr));
       gap: 4px;
       background: #0b0e14;
       padding: 8px;
@@ -137,6 +138,8 @@
 
     .cell {
       position: relative;
+      min-width: 0;
+      min-height: 0;
       border-radius: 6px;
       border: 1px solid rgba(255, 255, 255, 0.08);
       cursor: pointer;
