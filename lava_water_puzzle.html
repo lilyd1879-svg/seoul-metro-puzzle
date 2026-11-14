@@ -417,7 +417,7 @@
       </div>
       <ul class="rules">
         <li><strong>돌 배치/취소:</strong> 아무 칸이나 클릭하면 돌을 놓거나 취소할 수 있습니다. 취소 시 원래 지형이 그대로 복원됩니다.</li>
-        <li><strong>환경 조건:</strong> 돌이 놓인 칸의 <strong>주변 8칸</strong>에 용암과 물이 각각 1개 이상 있어야 합니다. (자기 자신의 원래 지형은 제외, 돌로 가려진 용암·물은 포함)</li>
+        <li><strong>환경 조건:</strong> 돌이 놓인 칸의 <strong>주변 8칸</strong>에 <strong>돌로 덮이지 않은</strong> 용암과 물이 각각 1개 이상 있어야 합니다. (자기 자신의 원래 지형은 제외, 돌을 취소하면 원래 지형 기능이 복원됨)</li>
         <li><strong>연결 조건:</strong> <strong>S와 E에도 반드시 돌</strong>을 놓아야 하며, 모든 돌 경로가 <strong>상하좌우</strong>로 끊기지 않고 이어져야 합니다. (대각선 불가)</li>
         <li><strong>최소 개수:</strong> 현재 놓은 돌의 개수가 BFS로 계산된 <strong>최소 돌 개수</strong>와 정확히 일치해야 성공입니다.</li>
       </ul>
@@ -453,10 +453,10 @@
       /**
        * Checks whether a stone at (r, c) satisfies the environment condition:
        * Among the 8 surrounding cells (excluding (r, c) itself), there must be
-       * at least one 'lava' and at least one 'water' in the immutable terrain.
-       * Stones placed on top of lava/water do not alter terrain, so covered cells still count.
+       * at least one 'lava' and at least one 'water' that is NOT covered by a stone.
+       * When a stone is removed from a cell, its original terrain functions again.
        */
-      function checkEnvironmentAt(terrain, r, c) {
+      function checkEnvironmentAt(terrain, r, c, stones = null) {
         let hasLava = false;
         let hasWater = false;
 
@@ -466,6 +466,7 @@
             const nr = r + dr;
             const nc = c + dc;
             if (!inBounds(nr, nc)) continue;
+            if (stones && stones[nr][nc]) continue; // Covered by stone -> acts as road only
 
             const cellTerrain = terrain[nr][nc];
             if (cellTerrain === TERRAIN_TYPES.LAVA) hasLava = true;
@@ -477,9 +478,9 @@
         return false;
       }
 
-      function computeValidPlacementGrid(terrain) {
+      function computeValidPlacementGrid(terrain, stones = null) {
         return Array.from({ length: GRID_SIZE }, (_, r) =>
-          Array.from({ length: GRID_SIZE }, (_, c) => checkEnvironmentAt(terrain, r, c))
+          Array.from({ length: GRID_SIZE }, (_, c) => checkEnvironmentAt(terrain, r, c, stones))
         );
       }
 
@@ -608,7 +609,7 @@
 
         for (let r = 0; r < GRID_SIZE; r++) {
           for (let c = 0; c < GRID_SIZE; c++) {
-            if (stones[r][c] && !checkEnvironmentAt(terrain, r, c)) {
+            if (stones[r][c] && !checkEnvironmentAt(terrain, r, c, stones)) {
               invalidStones.push({ r, c });
             }
           }
@@ -830,7 +831,10 @@
 
         function renderBoard() {
           boardEl.innerHTML = "";
-          const { terrain, stones, validGrid, start, end } = gameState;
+          const { terrain, stones, start, end } = gameState;
+          const activeValidGrid = showHints
+            ? computeValidPlacementGrid(terrain, stones)
+            : null;
 
           for (let r = 0; r < GRID_SIZE; r++) {
             for (let c = 0; c < GRID_SIZE; c++) {
@@ -846,7 +850,7 @@
               if (lastInvalidSet.has(`${r},${c}`)) {
                 cell.classList.add("invalid-stone");
               }
-              if (showHints && validGrid[r][c]) {
+              if (showHints && activeValidGrid[r][c]) {
                 cell.classList.add("hint-valid");
               }
 
