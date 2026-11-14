@@ -70,8 +70,39 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
       gap: 12px;
       margin-bottom: 14px;
+    }
+
+    .difficulty-group {
+      display: inline-flex;
+      background: #11161f;
+      border: 1px solid var(--panel-border);
+      border-radius: 10px;
+      padding: 3px;
+      gap: 3px;
+    }
+
+    .diff-btn {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      padding: 6px 10px;
+      border-radius: 7px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .diff-btn:hover {
+      background: #1d2534;
+      color: var(--text);
+    }
+
+    .diff-btn.active {
+      background: #0284c7;
+      color: #fff;
     }
 
     h1 {
@@ -382,6 +413,11 @@
           <h1>용암과 물의 돌다리 퍼즐</h1>
           <div class="subtitle">용암과 물이 만나는 지점에 돌을 놓아 S에서 E까지 연결하세요</div>
         </div>
+        <div class="difficulty-group" id="difficulty-group" role="group" aria-label="난이도 선택">
+          <button class="diff-btn" type="button" data-difficulty="easy">쉬움</button>
+          <button class="diff-btn active" type="button" data-difficulty="normal">보통</button>
+          <button class="diff-btn" type="button" data-difficulty="hard">어려움</button>
+        </div>
       </div>
 
       <div class="stats">
@@ -648,15 +684,21 @@
         };
       }
 
-      function generateRandomTerrain(rng) {
+      const DIFFICULTY_CONFIG = Object.freeze({
+        easy: { lavaProb: 0.33, waterProb: 0.33, minLen: 3, maxLen: 5 },
+        normal: { lavaProb: 0.28, waterProb: 0.28, minLen: 6, maxLen: 9 },
+        hard: { lavaProb: 0.24, waterProb: 0.24, minLen: 10, maxLen: 100 }
+      });
+
+      function generateRandomTerrain(rng, cfg = DIFFICULTY_CONFIG.normal) {
         const terrain = Array.from({ length: GRID_SIZE }, () =>
           Array(GRID_SIZE).fill(TERRAIN_TYPES.EMPTY)
         );
         for (let r = 0; r < GRID_SIZE; r++) {
           for (let c = 0; c < GRID_SIZE; c++) {
             const roll = rng();
-            if (roll < 0.28) terrain[r][c] = TERRAIN_TYPES.LAVA;
-            else if (roll < 0.56) terrain[r][c] = TERRAIN_TYPES.WATER;
+            if (roll < cfg.lavaProb) terrain[r][c] = TERRAIN_TYPES.LAVA;
+            else if (roll < cfg.lavaProb + cfg.waterProb) terrain[r][c] = TERRAIN_TYPES.WATER;
             else terrain[r][c] = TERRAIN_TYPES.EMPTY;
           }
         }
@@ -691,11 +733,19 @@
        * 4. Picks distinct S and E within a connected component
        * 5. Computes minStones via BFS and verifies full solvability
        */
-      function createPuzzle(rng = Math.random) {
-        for (let attempt = 0; attempt < 200; attempt++) {
-          const terrain = generateRandomTerrain(rng);
+      function createPuzzle(difficulty = "normal", rng = Math.random) {
+        if (typeof difficulty === "function") {
+          rng = difficulty;
+          difficulty = "normal";
+        }
+        const cfg = DIFFICULTY_CONFIG[difficulty] || DIFFICULTY_CONFIG.normal;
+
+        for (let attempt = 0; attempt < 250; attempt++) {
+          const terrain = generateRandomTerrain(rng, cfg);
           const validGrid = computeValidPlacementGrid(terrain);
-          const components = findValidComponents(validGrid).filter((c) => c.length >= 4);
+          const components = findValidComponents(validGrid).filter(
+            (c) => c.length >= Math.min(cfg.minLen, 4)
+          );
 
           if (components.length === 0) continue;
 
@@ -705,8 +755,9 @@
           const comp = topPool[Math.floor(rng() * topPool.length)];
 
           // Sample candidate (S, E) pairs in the chosen component
-          let bestCandidate = null;
-          const tries = Math.min(25, comp.length * 2);
+          let bestInRange = null;
+          let bestFallback = null;
+          const tries = Math.min(40, comp.length * 2);
           for (let t = 0; t < tries; t++) {
             const idxA = Math.floor(rng() * comp.length);
             let idxB = Math.floor(rng() * comp.length);
@@ -717,27 +768,29 @@
             const shortest = computeShortestPath(validGrid, start, end);
             if (!shortest) continue;
 
-            if (shortest.minStones >= 5) {
-              bestCandidate = { start, end, minStones: shortest.minStones };
+            if (shortest.minStones >= cfg.minLen && shortest.minStones <= cfg.maxLen) {
+              bestInRange = { start, end, minStones: shortest.minStones };
               break;
             }
-            if (!bestCandidate || shortest.minStones > bestCandidate.minStones) {
-              bestCandidate = { start, end, minStones: shortest.minStones };
+            if (!bestFallback || shortest.minStones > bestFallback.minStones) {
+              bestFallback = { start, end, minStones: shortest.minStones };
             }
           }
 
+          const chosen = bestInRange || (attempt >= 120 ? bestFallback : null);
           if (
-            bestCandidate &&
-            bestCandidate.minStones >= 3 &&
-            verifyPuzzleSolvable(terrain, bestCandidate.start, bestCandidate.end, bestCandidate.minStones)
+            chosen &&
+            chosen.minStones >= 3 &&
+            verifyPuzzleSolvable(terrain, chosen.start, chosen.end, chosen.minStones)
           ) {
             return {
               terrain,
               stones: createEmptyBooleanGrid(),
               validGrid,
-              start: bestCandidate.start,
-              end: bestCandidate.end,
-              minStones: bestCandidate.minStones
+              start: chosen.start,
+              end: chosen.end,
+              minStones: chosen.minStones,
+              difficulty
             };
           }
         }
@@ -786,7 +839,8 @@
 
       // Browser UI controller
       if (typeof document !== "undefined") {
-        let gameState = createPuzzle();
+        let currentDifficulty = "normal";
+        let gameState = createPuzzle(currentDifficulty);
         let showHints = false;
         let lastInvalidSet = new Set();
 
@@ -794,6 +848,7 @@
         const currentStonesEl = document.getElementById("current-stones");
         const minStonesEl = document.getElementById("min-stones");
         const messageBoxEl = document.getElementById("message-box");
+        const difficultyGroupEl = document.getElementById("difficulty-group");
         const btnCheck = document.getElementById("btn-check");
         const btnReset = document.getElementById("btn-reset");
         const btnNew = document.getElementById("btn-new");
@@ -901,10 +956,23 @@
         });
 
         function loadNewRandomMap() {
-          gameState = createPuzzle();
+          gameState = createPuzzle(currentDifficulty);
           clearMessage();
           renderBoard();
         }
+
+        difficultyGroupEl.addEventListener("click", (event) => {
+          const btn = event.target.closest(".diff-btn");
+          if (!btn) return;
+          const nextDiff = btn.dataset.difficulty;
+          if (!nextDiff || nextDiff === currentDifficulty) return;
+
+          currentDifficulty = nextDiff;
+          for (const el of difficultyGroupEl.querySelectorAll(".diff-btn")) {
+            el.classList.toggle("active", el === btn);
+          }
+          loadNewRandomMap();
+        });
 
         btnNew.addEventListener("click", loadNewRandomMap);
         btnRandomMap.addEventListener("click", loadNewRandomMap);
