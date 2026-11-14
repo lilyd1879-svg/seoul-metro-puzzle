@@ -658,6 +658,7 @@ html_content = f"""<!DOCTYPE html>
       <div class="actions-bar">
         <button class="btn" id="btn-undo">↩ 취소</button>
         <button class="btn" id="btn-reset">초기화</button>
+        <button class="btn" id="btn-reveal" style="border-color: rgba(250, 204, 21, 0.45); color: #fde047;">👁️ 정답 보기</button>
         <button class="btn btn-primary" id="btn-check">정답 확인</button>
       </div>
     </aside>
@@ -1343,6 +1344,13 @@ html_content = f"""<!DOCTYPE html>
         }}
       }}
       alert("현재까지의 경로가 완벽합니다!");
+    }});
+
+    document.getElementById("btn-reveal").addEventListener("click", () => {{
+      if (!currentStage) return;
+      userPath = [...currentStage.path];
+      updatePathUI();
+      alert(`🔓 정답 경로 (${{currentStage.path.length}}역 · 최소 환승 ${{currentStage.transfers}}회)\n\n${{currentStage.path.join(" ➔ ")}}\n\n[이용 노선: ${{currentStage.lines.join(" ➔ ")}}]`);
     }});
 
     document.getElementById("btn-next-stage").addEventListener("click", () => {{
