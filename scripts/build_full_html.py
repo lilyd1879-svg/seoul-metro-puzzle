@@ -677,8 +677,8 @@ html_content = f"""<!DOCTYPE html>
         <div class="legend-grid" id="legend-grid"></div>
       </div>
 
-      <!-- Full Map ViewBox -->
-      <svg id="metro-svg" viewBox="-20 70 1440 940">
+      <!-- Full Map ViewBox (1.5x Spread Layout) -->
+      <svg id="metro-svg" viewBox="-30 100 2180 1420">
         <defs>
           <filter id="path-glow" x="-30%" y="-30%" width="160%" height="160%">
             <feGaussianBlur stdDeviation="4" result="blur" />
@@ -686,11 +686,11 @@ html_content = f"""<!DOCTYPE html>
           </filter>
         </defs>
 
-        <!-- Han River Ribbon across full map -->
+        <!-- Han River Ribbon across full map (1.5x scaled) -->
         <g id="han-river-group">
-          <path d="M -50 470 Q 250 470, 440 500 T 700 570 T 950 560 T 1450 660 L 1450 700 Q 950 600, 700 610 T 440 540 T -50 510 Z"
-                fill="rgba(24, 53, 94, 0.4)" stroke="rgba(56, 189, 248, 0.15)" stroke-width="1.5" />
-          <text x="580" y="560" fill="rgba(56, 189, 248, 0.28)" font-size="22" font-weight="700" letter-spacing="10">한  강 (HAN RIVER)</text>
+          <path d="M -80 705 Q 375 705, 660 750 T 1050 855 T 1425 840 T 2175 990 L 2175 1050 Q 1425 900, 1050 915 T 660 810 T -80 765 Z"
+                fill="rgba(24, 53, 94, 0.4)" stroke="rgba(56, 189, 248, 0.15)" stroke-width="2" />
+          <text x="870" y="840" fill="rgba(56, 189, 248, 0.28)" font-size="32" font-weight="700" letter-spacing="14">한  강 (HAN RIVER)</text>
         </g>
 
         <g id="tracks-layer"></g>
@@ -745,7 +745,7 @@ html_content = f"""<!DOCTYPE html>
     let userPath = [];
     let clearedStages = new Set(JSON.parse(localStorage.getItem("seoul_metro_cleared") || "[]"));
 
-    const defaultViewBox = {{ x: -20, y: 70, w: 1440, h: 940 }};
+    const defaultViewBox = {{ x: -30, y: 100, w: 2180, h: 1420 }};
     let viewBox = {{ ...defaultViewBox }};
     let isPanning = false;
     let panStart = {{ x: 0, y: 0 }};
@@ -1007,36 +1007,52 @@ html_content = f"""<!DOCTYPE html>
       }}
     }}
 
-    // Exact DP solver for minimum transfers and all valid line sequences
+    // Exact DP solver for minimum transfers and all valid line sequences (matches Python solver 1:1)
     function getValidLineSequences(path) {{
       if (path.length < 2) return [[]];
-      function dfsLines(idx, currentLines) {{
-        if (idx === path.length - 1) return [currentLines];
-        const u = path[idx], v = path[idx + 1];
-        const valid = [...new Set(adj[u].filter(e => e.neighbor === v).map(e => e.line))];
-        let res = [];
-        if (currentLines.length > 0 && valid.includes(currentLines[currentLines.length - 1])) {{
-          res = res.concat(dfsLines(idx + 1, [...currentLines, currentLines[currentLines.length - 1]]));
-        }} else {{
-          for (const l of valid) {{
-            res = res.concat(dfsLines(idx + 1, [...currentLines, l]));
+      const u0 = path[0], u1 = path[1];
+      const initLines = [...new Set(adj[u0].filter(e => e.neighbor === u1).map(e => e.line))].sort();
+      let dp = {{}};
+      for (const l of initLines) dp[l] = [[l]];
+
+      for (let i = 1; i < path.length - 1; i++) {{
+        const u = path[i], v = path[i + 1];
+        const validLines = [...new Set(adj[u].filter(e => e.neighbor === v).map(e => e.line))].sort();
+        const nextDp = {{}};
+        for (const lNext of validLines) {{
+          let bestLen = 9999;
+          let bestSeqs = [];
+          for (const [lPrev, seqsPrev] of Object.entries(dp)) {{
+            for (const seqPrev of seqsPrev) {{
+              const cand = (lPrev === lNext) ? seqPrev : [...seqPrev, lNext];
+              if (cand.length < bestLen) {{
+                bestLen = cand.length;
+                bestSeqs = [cand];
+              }} else if (cand.length === bestLen) {{
+                const key = JSON.stringify(cand);
+                if (!bestSeqs.some(s => JSON.stringify(s) === key)) bestSeqs.push(cand);
+              }}
+            }}
+          }}
+          if (bestSeqs.length > 0) nextDp[lNext] = bestSeqs;
+        }}
+        dp = nextDp;
+      }}
+
+      let allMin = [];
+      let minLen = 9999;
+      for (const seqList of Object.values(dp)) {{
+        for (const s of seqList) {{
+          if (s.length < minLen) {{
+            minLen = s.length;
+            allMin = [s];
+          }} else if (s.length === minLen) {{
+            const key = JSON.stringify(s);
+            if (!allMin.some(x => JSON.stringify(x) === key)) allMin.push(s);
           }}
         }}
-        return res;
       }}
-      const raw = dfsLines(0, []);
-      const compressed = [];
-      for (const seq of raw) {{
-        const comp = [];
-        for (const l of seq) {{
-          if (comp.length === 0 || comp[comp.length - 1] !== l) comp.push(l);
-        }}
-        if (!compressed.some(c => JSON.stringify(c) === JSON.stringify(comp))) {{
-          compressed.push(comp);
-        }}
-      }}
-      compressed.sort((a, b) => a.length - b.length);
-      return compressed;
+      return allMin;
     }}
 
     function analyzeUserPath() {{
@@ -1225,8 +1241,8 @@ html_content = f"""<!DOCTYPE html>
     mapArea.addEventListener("wheel", (e) => {{
       e.preventDefault();
       const zoomFactor = e.deltaY > 0 ? 1.12 : 0.88;
-      const newW = Math.max(300, Math.min(2000, viewBox.w * zoomFactor));
-      const newH = Math.max(200, Math.min(1300, viewBox.h * zoomFactor));
+      const newW = Math.max(400, Math.min(3000, viewBox.w * zoomFactor));
+      const newH = Math.max(260, Math.min(1950, viewBox.h * zoomFactor));
       viewBox.x += (viewBox.w - newW) / 2;
       viewBox.y += (viewBox.h - newH) / 2;
       viewBox.w = newW; viewBox.h = newH;
