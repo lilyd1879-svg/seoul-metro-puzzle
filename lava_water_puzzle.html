@@ -75,7 +75,15 @@
       margin-bottom: 14px;
     }
 
-    .difficulty-group {
+    .header-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .difficulty-group,
+    .mode-group {
       display: inline-flex;
       background: #11161f;
       border: 1px solid var(--panel-border);
@@ -84,7 +92,8 @@
       gap: 3px;
     }
 
-    .diff-btn {
+    .diff-btn,
+    .mode-btn {
       border: none;
       background: transparent;
       color: var(--muted);
@@ -95,14 +104,60 @@
       cursor: pointer;
     }
 
-    .diff-btn:hover {
+    .diff-btn:hover,
+    .mode-btn:hover {
       background: #1d2534;
       color: var(--text);
     }
 
-    .diff-btn.active {
+    .diff-btn.active,
+    .mode-btn.active {
       background: #0284c7;
       color: #fff;
+    }
+
+    .tool-palette {
+      display: none;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .tool-palette.show {
+      display: grid;
+    }
+
+    .tool-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 9px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--panel-border);
+      background: #11161f;
+      color: var(--text);
+      font-size: 0.86rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .tool-btn.active {
+      border-color: var(--accent);
+      background: #1a283b;
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.35);
+    }
+
+    .count-red {
+      color: #ff6b4a;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .count-blue {
+      color: #38bdf8;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
     }
 
     h1 {
@@ -413,10 +468,16 @@
           <h1>용암과 물의 돌다리 퍼즐</h1>
           <div class="subtitle">용암과 물이 만나는 지점에 돌을 놓아 S에서 E까지 연결하세요</div>
         </div>
-        <div class="difficulty-group" id="difficulty-group" role="group" aria-label="난이도 선택">
-          <button class="diff-btn" type="button" data-difficulty="easy">쉬움</button>
-          <button class="diff-btn active" type="button" data-difficulty="normal">보통</button>
-          <button class="diff-btn" type="button" data-difficulty="hard">어려움</button>
+        <div class="header-controls">
+          <div class="mode-group" id="mode-group" role="group" aria-label="게임 모드 선택">
+            <button class="mode-btn active" type="button" data-mode="standard">기본 모드</button>
+            <button class="mode-btn" type="button" data-mode="builder">직접 설치</button>
+          </div>
+          <div class="difficulty-group" id="difficulty-group" role="group" aria-label="난이도 선택">
+            <button class="diff-btn" type="button" data-difficulty="easy">쉬움</button>
+            <button class="diff-btn active" type="button" data-difficulty="normal">보통</button>
+            <button class="diff-btn" type="button" data-difficulty="hard">어려움</button>
+          </div>
         </div>
       </div>
 
@@ -429,6 +490,20 @@
           <span class="stat-label">최소 돌 개수</span>
           <span class="stat-value" id="min-stones">0</span>
         </div>
+      </div>
+
+      <div class="tool-palette" id="tool-palette" role="group" aria-label="설치 도구 선택">
+        <button class="tool-btn active" type="button" data-tool="stone">
+          <span class="swatch stone"></span><span>돌</span>
+        </button>
+        <button class="tool-btn" type="button" data-tool="lava">
+          <span class="swatch lava"></span><span>용암</span>
+          <span class="count-red" id="lava-left">0</span>
+        </button>
+        <button class="tool-btn" type="button" data-tool="water">
+          <span class="swatch water"></span><span>물</span>
+          <span class="count-blue" id="water-left">0</span>
+        </button>
       </div>
 
       <div class="board" id="board" role="grid" aria-label="10x10 퍼즐 격자판"></div>
@@ -817,6 +892,99 @@
         };
       }
 
+      /**
+       * Creates a builder-mode puzzle:
+       * All cells start empty; only S and E are placed.
+       * The player receives limited red (lava) and blue (water) placements
+       * and must place lava, water, and stones to connect S to E in minStones.
+       */
+      function createBuilderPuzzle(difficulty = "normal", rng = Math.random) {
+        if (typeof difficulty === "function") {
+          rng = difficulty;
+          difficulty = "normal";
+        }
+        const cfg = DIFFICULTY_CONFIG[difficulty] || DIFFICULTY_CONFIG.normal;
+
+        let start = { r: 1, c: 1 };
+        let end = { r: 8, c: 8 };
+        let minStones = 15;
+
+        for (let attempt = 0; attempt < 200; attempt++) {
+          const sr = Math.floor(rng() * GRID_SIZE);
+          const sc = Math.floor(rng() * GRID_SIZE);
+          const er = Math.floor(rng() * GRID_SIZE);
+          const ec = Math.floor(rng() * GRID_SIZE);
+          if (sr === er && sc === ec) continue;
+
+          const dist = Math.abs(sr - er) + Math.abs(sc - ec) + 1;
+          if (dist >= cfg.minLen && dist <= cfg.maxLen) {
+            start = { r: sr, c: sc };
+            end = { r: er, c: ec };
+            minStones = dist;
+            break;
+          }
+        }
+
+        const extra = difficulty === "easy" ? 2 : difficulty === "normal" ? 1 : 0;
+        const budget = Math.max(2, Math.ceil(minStones / 2) + extra);
+
+        return {
+          mode: "builder",
+          difficulty,
+          terrain: Array.from({ length: GRID_SIZE }, () =>
+            Array(GRID_SIZE).fill(TERRAIN_TYPES.EMPTY)
+          ),
+          stones: createEmptyBooleanGrid(),
+          start,
+          end,
+          minStones,
+          lavaBudget: budget,
+          waterBudget: budget,
+          lavaLeft: budget,
+          waterLeft: budget
+        };
+      }
+
+      /**
+       * Applies a builder tool ('stone', 'lava', 'water') to cell (r, c).
+       */
+      function applyBuilderTool(state, tool, r, c) {
+        if (tool === "stone") {
+          state.stones[r][c] = !state.stones[r][c];
+          return { changed: true };
+        }
+
+        if (tool === TERRAIN_TYPES.LAVA || tool === TERRAIN_TYPES.WATER) {
+          const isLava = tool === TERRAIN_TYPES.LAVA;
+          const current = state.terrain[r][c];
+
+          if (current === tool) {
+            state.terrain[r][c] = TERRAIN_TYPES.EMPTY;
+            if (isLava) state.lavaLeft++;
+            else state.waterLeft++;
+            return { changed: true };
+          }
+
+          const left = isLava ? state.lavaLeft : state.waterLeft;
+          if (left <= 0) {
+            return {
+              changed: false,
+              reason: `${isLava ? "용암" : "물"} 설치 가능 개수가 부족합니다.`
+            };
+          }
+
+          if (current === TERRAIN_TYPES.LAVA) state.lavaLeft++;
+          else if (current === TERRAIN_TYPES.WATER) state.waterLeft++;
+
+          state.terrain[r][c] = tool;
+          if (isLava) state.lavaLeft--;
+          else state.waterLeft--;
+          return { changed: true };
+        }
+
+        return { changed: false };
+      }
+
       const PuzzleCore = {
         GRID_SIZE,
         TERRAIN_TYPES,
@@ -829,7 +997,9 @@
         countStones,
         evaluateSolution,
         verifyPuzzleSolvable,
-        createPuzzle
+        createPuzzle,
+        createBuilderPuzzle,
+        applyBuilderTool
       };
 
       // Export for Node.js testing when running outside browser DOM
@@ -839,7 +1009,9 @@
 
       // Browser UI controller
       if (typeof document !== "undefined") {
+        let currentMode = "standard";
         let currentDifficulty = "normal";
+        let activeTool = "stone";
         let gameState = createPuzzle(currentDifficulty);
         let showHints = false;
         let lastInvalidSet = new Set();
@@ -848,7 +1020,11 @@
         const currentStonesEl = document.getElementById("current-stones");
         const minStonesEl = document.getElementById("min-stones");
         const messageBoxEl = document.getElementById("message-box");
+        const modeGroupEl = document.getElementById("mode-group");
         const difficultyGroupEl = document.getElementById("difficulty-group");
+        const toolPaletteEl = document.getElementById("tool-palette");
+        const lavaLeftEl = document.getElementById("lava-left");
+        const waterLeftEl = document.getElementById("water-left");
         const btnCheck = document.getElementById("btn-check");
         const btnReset = document.getElementById("btn-reset");
         const btnNew = document.getElementById("btn-new");
@@ -884,6 +1060,13 @@
           currentStonesEl.className = "stat-value";
           if (current === gameState.minStones) currentStonesEl.classList.add("match");
           else if (current > gameState.minStones) currentStonesEl.classList.add("over");
+
+          const isBuilder = currentMode === "builder";
+          toolPaletteEl.classList.toggle("show", isBuilder);
+          if (isBuilder) {
+            lavaLeftEl.textContent = String(gameState.lavaLeft);
+            waterLeftEl.textContent = String(gameState.waterLeft);
+          }
         }
 
         function renderBoard() {
@@ -936,8 +1119,17 @@
           const r = Number(cellEl.dataset.row);
           const c = Number(cellEl.dataset.col);
 
-          // Toggle stone only; terrain[r][c] is never modified
-          gameState.stones[r][c] = !gameState.stones[r][c];
+          if (currentMode === "builder") {
+            const res = applyBuilderTool(gameState, activeTool, r, c);
+            if (!res.changed && res.reason) {
+              messageBoxEl.className = "message-box show error";
+              messageBoxEl.innerHTML = `<div class="message-title">${res.reason}</div>`;
+              return;
+            }
+          } else {
+            // Toggle stone only; terrain[r][c] is never modified
+            gameState.stones[r][c] = !gameState.stones[r][c];
+          }
           clearMessage();
           renderBoard();
         });
@@ -956,10 +1148,44 @@
         });
 
         function loadNewRandomMap() {
-          gameState = createPuzzle(currentDifficulty);
+          gameState =
+            currentMode === "builder"
+              ? createBuilderPuzzle(currentDifficulty)
+              : createPuzzle(currentDifficulty);
           clearMessage();
           renderBoard();
         }
+
+        modeGroupEl.addEventListener("click", (event) => {
+          const btn = event.target.closest(".mode-btn");
+          if (!btn) return;
+          const nextMode = btn.dataset.mode;
+          if (!nextMode || nextMode === currentMode) return;
+
+          currentMode = nextMode;
+          for (const el of modeGroupEl.querySelectorAll(".mode-btn")) {
+            el.classList.toggle("active", el === btn);
+          }
+          if (currentMode === "builder") {
+            activeTool = "stone";
+            for (const el of toolPaletteEl.querySelectorAll(".tool-btn")) {
+              el.classList.toggle("active", el.dataset.tool === "stone");
+            }
+          }
+          loadNewRandomMap();
+        });
+
+        toolPaletteEl.addEventListener("click", (event) => {
+          const btn = event.target.closest(".tool-btn");
+          if (!btn) return;
+          const nextTool = btn.dataset.tool;
+          if (!nextTool) return;
+
+          activeTool = nextTool;
+          for (const el of toolPaletteEl.querySelectorAll(".tool-btn")) {
+            el.classList.toggle("active", el === btn);
+          }
+        });
 
         difficultyGroupEl.addEventListener("click", (event) => {
           const btn = event.target.closest(".diff-btn");
