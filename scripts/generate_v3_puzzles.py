@@ -279,7 +279,7 @@ def collect_tier(difficulty, count, min_l, max_l, mode="any", preferred_starts=N
             continue
 
         d = dist_map[s].get(e, 999)
-        pair_max_l = min(max_l, d + 4)
+        pair_max_l = min(max_l, d + (6 if mode == "hard_detour" else 4))
         all_paths_ext, trunc = find_all_simple_paths(s, e, pair_max_l + 3, adj, cap=20000)
         if trunc:
             all_paths_N, trunc_N = find_all_simple_paths(s, e, pair_max_l, adj, cap=20000)
@@ -291,7 +291,13 @@ def collect_tier(difficulty, count, min_l, max_l, mode="any", preferred_starts=N
             continue
 
         cand_paths = [p for p in all_paths_ext if min_l <= len(p) <= pair_max_l]
-        random.shuffle(cand_paths)
+        if mode == "hard_detour":
+            # Prefer longer detours and high transfer counts first
+            cand_paths.sort(key=lambda p: -(len(p) - d))
+            cand_paths = cand_paths[:20]
+            random.shuffle(cand_paths)
+        else:
+            random.shuffle(cand_paths)
 
         for path in cand_paths[:15]:
             p_len = len(path)
@@ -312,9 +318,12 @@ def collect_tier(difficulty, count, min_l, max_l, mode="any", preferred_starts=N
             elif mode == "require_special":
                 if not any(l in special_lines for l in line_seq):
                     continue
+            elif mode == "hard_detour":
+                if p_transfers < 3 and (p_len - 1) < d + 3:
+                    continue
 
             sec_pool = [("transfer_count", p_transfers), ("river_crossings", p_rc)]
-            if len(line_seq) <= 3:
+            if len(line_seq) <= 5:
                 sec_pool.append(("line_sequence", line_seq))
             for l in line_seq:
                 if l in special_lines or l in {"신림선", "우이신설선", "공항철도", "신분당선", "인천1호선", "인천2호선"}:
@@ -370,7 +379,13 @@ special_stations = [
 metro_stations = [n for n in candidate_pool if any(l in metro_only for l in STATIONS[n]["lines"])]
 
 master_stages = collect_tier("초고난이도", 50, 4, 8, mode="require_special", preferred_starts=list(set(special_stations)))
-hard_stages = collect_tier("어려움", 50, 7, 10, mode="any")
+hard_detour = collect_tier("어려움", 25, 7, 12, mode="hard_detour", preferred_starts=hub_stations)
+hard_std = collect_tier("어려움", 25, 7, 10, mode="any")
+hard_stages = hard_detour + hard_std
+for idx, st in enumerate(hard_stages, 1):
+    st["level"] = idx
+    st["id"] = f"어려움-{idx}"
+    st["title"] = f"{st['start']} ➔ {st['end']} (어려움 #{idx})"
 medium_stages = collect_tier("중간", 50, 5, 7, mode="any")
 easy_stages = collect_tier("쉬움", 50, 3, 5, mode="metro_only", preferred_starts=metro_stations)
 
