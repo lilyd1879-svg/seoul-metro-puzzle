@@ -12,7 +12,7 @@ from metro_data_v3 import STATIONS, LINES, LINE_COLORS, HAN_RIVER_CROSSINGS
 def gentle_spread(stations):
     names = list(stations.keys())
     line2_set = set(LINES["2호선"])
-    min_dist = 38.0
+    min_dist = 56.0
     for _ in range(80):
         moved = False
         for i in range(len(names)):
