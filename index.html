@@ -1273,7 +1273,7 @@
       const relX = (e.clientX - rect.left) / rect.width;
       const relY = (e.clientY - rect.top) / rect.height;
 
-      const newW = Math.max(450, Math.min(5200, viewBox.w * zoomFactor));
+      const newW = Math.max(160, Math.min(5200, viewBox.w * zoomFactor));
       const newH = newW * (defaultViewBox.h / defaultViewBox.w);
       viewBox.x += (viewBox.w - newW) * relX;
       viewBox.y += (viewBox.h - newH) * relY;
@@ -1282,14 +1282,14 @@
     }, { passive: false });
 
     document.getElementById("btn-zoom-in").addEventListener("click", () => {
-      const newW = Math.max(450, viewBox.w * 0.9);
+      const newW = Math.max(160, viewBox.w * 0.78);
       const newH = newW * (defaultViewBox.h / defaultViewBox.w);
       viewBox.x += (viewBox.w - newW) / 2; viewBox.y += (viewBox.h - newH) / 2;
       viewBox.w = newW; viewBox.h = newH;
       updateSvgViewBox();
     });
     document.getElementById("btn-zoom-out").addEventListener("click", () => {
-      const newW = Math.min(5200, viewBox.w * 1.1);
+      const newW = Math.min(5200, viewBox.w * 1.28);
       const newH = newW * (defaultViewBox.h / defaultViewBox.w);
       viewBox.x += (viewBox.w - newW) / 2; viewBox.y += (viewBox.h - newH) / 2;
       viewBox.w = newW; viewBox.h = newH;
