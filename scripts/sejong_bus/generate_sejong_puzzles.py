@@ -9,8 +9,8 @@ import math
 import random
 from collections import defaultdict
 from sejong_bus_data import (
-    STOPS_COORDS, LINES, LINE_COLORS, GEUMGANG_CROSSINGS,
-    NORTH_BANK, SOUTH_BANK
+    STOPS_COORDS, LINES, LINE_COLORS, STREAM_CROSSINGS,
+    WEST_BANK, EAST_BANK
 )
 
 
@@ -21,7 +21,7 @@ def build_stations_dict():
             "x": float(x),
             "y": float(y),
             "lines": [],
-            "bank": "north" if name in NORTH_BANK else "south"
+            "bank": "west" if name in WEST_BANK else "east"
         }
     for line_name, seq in LINES.items():
         for st in seq:
@@ -156,7 +156,7 @@ def get_valid_line_sequences(path, adj):
 
 
 def analyze_path(path, adj):
-    river = sum(1 for i in range(len(path) - 1) if (path[i], path[i + 1]) in GEUMGANG_CROSSINGS)
+    river = sum(1 for i in range(len(path) - 1) if (path[i], path[i + 1]) in STREAM_CROSSINGS)
     seqs = get_valid_line_sequences(path, adj)
     transfers = len(seqs[0]) - 1 if seqs and seqs[0] else 0
     return transfers, river, seqs
@@ -220,8 +220,8 @@ def make_clue_obj(ctype, val):
         return {"type": ctype, "val": val, "text": f"최소 노선 환승 {val}회"}
     if ctype == "river_crossings":
         if val == 0:
-            return {"type": ctype, "val": val, "text": "금강을 건너지 않음 (횡단 0회)"}
-        return {"type": ctype, "val": val, "text": f"금강 다리 총 {val}회 횡단"}
+            return {"type": ctype, "val": val, "text": "방축천을 건너지 않음 (횡단 0회)"}
+        return {"type": ctype, "val": val, "text": f"방축천 다리 총 {val}회 횡단"}
     if ctype == "via_station":
         return {"type": ctype, "val": val, "text": f"'{val}' 정류장 반드시 경유"}
     if ctype == "avoid_station":
@@ -235,25 +235,25 @@ def make_clue_obj(ctype, val):
 
 THEMES = {
     "쉬움": [
-        ("정부청사 출근길", "세종 시내 핵심 거점을 잇는 첫 버스 노선을 추적하세요."),
-        ("한누리대로 순환", "바로타 전용차로를 따라 막힘없이 이동하는 최적 경로를 찾으세요."),
-        ("캠퍼스에서 도심으로", "조치원 대학가에서 행복도시로 향하는 직통 노선을 추리하세요."),
-        ("생활권 마실", "아파트 단지와 복합커뮤니티센터를 연결하는 지선버스 경로입니다."),
+        ("정부세종청사 출근길", "어진동 청사와 도담동·아름동을 잇는 생활권 버스 노선을 추적하세요."),
+        ("1생활권 마실", "고운동·아름동·종촌동 단지와 복합커뮤니티센터를 연결하는 순환 경로입니다."),
+        ("세종호수공원 나들이", "국립세종도서관과 호수공원으로 향하는 직통 노선을 추리하세요."),
+        ("충남대병원 통원길", "도담동과 1생활권 각 단지를 연결하는 빠른 버스 경로입니다."),
     ],
     "중간": [
-        ("금강을 건너는 통근", "금강 북측과 남측 생활권을 환승으로 연결하는 논리 퍼즐입니다."),
-        ("국책연구단지 출장", "정부청사와 반곡·소담동 연구단지를 오가는 최단 환승 루트입니다."),
-        ("조치원-신도시 연계", "읍면 지역과 행복도시를 이어주는 간선·광역 환승을 계산하세요."),
-        ("대전-세종 광역 통학", "반석역 방면 광역버스와 시내버스의 환승 지점을 찾아내세요."),
+        ("방축천을 건너는 통학", "고운·아름·종촌동과 도담·어진동 학교·청사를 환승으로 연결하세요."),
+        ("201·202번 순환 연계", "1생활권 외곽순환과 내부순환 버스의 환승 거점을 찾아내세요."),
+        ("도담·어진 청사 순회", "정부세종청사 북측·중앙동·남측과 인근 기관을 오가는 최적 경로입니다."),
+        ("아름동·종촌동 학원가", "가재마을과 범지기마을을 잇는 생활권 지선 환승 퍼즐입니다."),
     ],
     "어려움": [
-        ("다중 환승 챌린지", "정류장 수와 환승 횟수, 금강 횡단 조건을 모두 만족하는 유일한 경로입니다."),
-        ("우회 노선 추리", "특정 정류장 공사 우회로 인해 평소와 다른 환승 경로를 선택해야 합니다."),
-        ("BRT·지선 입체 환승", "바로타와 200번대 지선버스를 정교하게 조합해야 풀리는 경로입니다."),
+        ("1생활권 다중 환승 챌린지", "정류장 수와 환승 횟수, 방축천 횡단 조건을 모두 만족하는 유일한 경로입니다."),
+        ("고운동·어진동 우회 추리", "특정 정류장 경유를 피해 201·202·221·1000번을 조합해야 합니다."),
+        ("방축천 입체 환승", "지선·순환·광역버스를 정교하게 환승해 목적지까지 도달하세요."),
     ],
     "초고난이도": [
-        ("세종 마스터 내비게이터", "노선 순서 힌트 없이 오직 정황 단서만으로 유일한 버스 경로를 복원하세요."),
-        ("마지막 심야 막차", "오송·조치원·대전·행복도시를 넘나드는 고난도 다중 환승 퍼즐입니다."),
+        ("1생활권 마스터 내비게이터", "노선 순서 힌트 없이 오직 정황 단서만으로 유일한 버스 경로를 복원하세요."),
+        ("1생활권 마지막 막차", "고운·아름·종촌·도담·어진 5개 동을 넘나드는 고난도 다중 환승 퍼즐입니다."),
     ],
 }
 

@@ -9,13 +9,13 @@ Build standalone sejong_bus.html for Sejong City Bus & BRT Logic Puzzle:
 """
 
 import json
-from sejong_bus_data import GEUMGANG_CROSSINGS, EXPRESS_DASHED_LINES, BRT_LINES
+from sejong_bus_data import STREAM_CROSSINGS, EXPRESS_DASHED_LINES, BRT_LINES
 
 with open("scripts/sejong_bus/sejong_game_data.json", "r", encoding="utf-8") as f:
     game_data = json.load(f)
 
 json_data_str = json.dumps(game_data, ensure_ascii=False)
-river_pairs_list = [f"{u}-{v}" for (u, v) in sorted(GEUMGANG_CROSSINGS)]
+river_pairs_list = [f"{u}-{v}" for (u, v) in sorted(STREAM_CROSSINGS)]
 river_pairs_js = json.dumps(river_pairs_list, ensure_ascii=False)
 dashed_lines_js = json.dumps(sorted(EXPRESS_DASHED_LINES), ensure_ascii=False)
 brt_lines_js = json.dumps(sorted(BRT_LINES), ensure_ascii=False)
@@ -25,7 +25,7 @@ html_content = f"""<!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>세종 바로타: 마지막 버스 — 세종시 버스노선 논리 퍼즐</title>
+  <title>세종 1생활권 버스 퍼즐 — 고운·아름·종촌·도담·어진</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -345,8 +345,8 @@ html_content = f"""<!DOCTYPE html>
 
   <header>
     <div class="logo-group">
-      <span class="logo-badge">SEJONG BAROTA</span>
-      <h1 class="logo-title">세종 바로타: 마지막 버스 (버스노선 논리 퍼즐)</h1>
+      <span class="logo-badge">SEJONG 1-ZONE</span>
+      <h1 class="logo-title">세종 1생활권: 마지막 버스 (고운·아름·종촌·도담·어진)</h1>
     </div>
 
     <div class="header-controls">
@@ -407,7 +407,7 @@ html_content = f"""<!DOCTYPE html>
         <div class="route-sequence-preview" id="route-preview-text">-</div>
         <div class="stats-row" style="margin-top: 2px;">
           <span style="color: var(--text-muted);">최소 환승: <span id="current-transfers-count" style="color: white; font-weight: 600;">0회</span></span>
-          <span style="color: var(--text-muted);">금강 횡단: <span id="current-river-count" style="color: white; font-weight: 600;">0회</span></span>
+          <span style="color: var(--text-muted);">방축천 횡단: <span id="current-river-count" style="color: white; font-weight: 600;">0회</span></span>
         </div>
       </div>
 
@@ -422,18 +422,18 @@ html_content = f"""<!DOCTYPE html>
 
     <main class="map-container" id="map-area">
       <div class="guide-banner">
-        🚌 세종시 BRT(바로타)·시내버스 노선망 · 인접 정류장을 클릭해 연결하세요 (휠 줌/드래그 지원)
+        🚌 세종시 1생활권(고운·아름·종촌·도담·어진) 버스망 · 인접 정류장을 클릭해 연결하세요 (휠 줌/드래그 지원)
       </div>
 
       <div class="legend-panel">
         <div class="legend-header" id="legend-toggle">
-          <span>🚌 세종 버스 노선 범례 (15개 노선)</span>
+          <span>🚌 1생활권 버스 범례 (12개 노선)</span>
           <span id="legend-arrow">▼</span>
         </div>
         <div class="legend-grid" id="legend-grid"></div>
       </div>
 
-      <svg id="bus-svg" viewBox="120 40 2560 2320">
+      <svg id="bus-svg" viewBox="60 20 2260 1820">
         <defs>
           <filter id="path-glow" x="-30%" y="-30%" width="160%" height="160%">
             <feGaussianBlur stdDeviation="6" result="blur" />
@@ -441,11 +441,20 @@ html_content = f"""<!DOCTYPE html>
           </filter>
         </defs>
 
-        <!-- Geumgang River (금강) Ribbon dividing North Bank (1·2·5·6생활권) and South Bank (3·4생활권) -->
-        <g id="geumgang-river-group">
-          <path d="M 100 1630 Q 650 1560 1120 1595 T 2050 1525 T 2680 1410 L 2680 1500 Q 2050 1615 1120 1675 T 100 1715 Z"
-                fill="rgba(14, 116, 144, 0.30)" stroke="rgba(56, 189, 248, 0.25)" stroke-width="3" />
-          <text x="420" y="1655" fill="rgba(56, 189, 248, 0.38)" font-size="34" font-weight="700" letter-spacing="12">금  강 (GEUMGANG RIVER)</text>
+        <!-- 1-District Neighborhood Watermarks -->
+        <g id="zone-labels" fill="rgba(148, 163, 184, 0.13)" font-size="42" font-weight="800" letter-spacing="4">
+          <text x="280" y="340">1-1 고운동</text>
+          <text x="980" y="180">1-2 아름동</text>
+          <text x="340" y="1240">1-3 종촌동</text>
+          <text x="1660" y="260">1-4 도담동</text>
+          <text x="1920" y="1360">1-5 어진동</text>
+        </g>
+
+        <!-- Bangchukcheon Stream (방축천) dividing West 1-Zone (고운·아름·종촌) and East 1-Zone (도담·어진) -->
+        <g id="bangchukcheon-group">
+          <path d="M 1240 20 Q 1290 360 1280 720 T 1310 1280 T 1260 1820 L 1345 1820 Q 1390 1280 1360 720 T 1320 20 Z"
+                fill="rgba(14, 116, 144, 0.28)" stroke="rgba(56, 189, 248, 0.22)" stroke-width="3" />
+          <text x="1312" y="1060" fill="rgba(56, 189, 248, 0.36)" font-size="24" font-weight="700" letter-spacing="8" transform="rotate(-90 1312 1060)">방 축 천 (BANGCHUKCHEON)</text>
         </g>
 
         <g id="tracks-layer"></g>
@@ -482,12 +491,11 @@ html_content = f"""<!DOCTYPE html>
   <!-- Guide Modal -->
   <div class="modal-overlay" id="guide-modal">
     <div class="guide-modal-box">
-      <h3>🚌 세종 바로타 버스 퍼즐 안내</h3>
+      <h3>🚌 세종 1생활권 버스 퍼즐 안내</h3>
       <ul>
-        <li><strong>목표:</strong> 출발(초록) 정류장에서 도착(빨강) 정류장까지 모든 단서를 만족하는 <strong>유일한 버스 경로</strong>를 연결하세요.</li>
-        <li><strong>BRT 바로타 (B0·B1·B2·B4):</strong> 한누리대로 전용차로를 따라 신도시 생활권과 오송역·반석역·대전역을 빠르게 연결합니다.</li>
-        <li><strong>지선·간선·광역 (201~222, 300, 601, 991, 1000~1005):</strong> 아파트 단지, 조치원·부강·장군면·연기면 등 읍면 지역과 대전을 촘촘히 잇습니다.</li>
-        <li><strong>금강 횡단:</strong> 금강 이북(1·2·5·6생활권, 조치원)과 이남(3·4생활권, 금남면, 반석·대전역)을 다리로 건널 때마다 횡단 횟수가 1회 증가합니다.</li>
+        <li><strong>대상 권역:</strong> 세종시 <strong>1생활권(1-1 고운동 · 1-2 아름동 · 1-3 종촌동 · 1-4 도담동 · 1-5 어진동)</strong>과 인접 관문 정류장을 중심으로 구성되었습니다.</li>
+        <li><strong>생활권 순환(201·202·203·205):</strong> 아파트 단지(가락·범지기·가재·도램마을)와 정부세종청사, 충남대병원, 호수공원을 순환합니다.</li>
+        <li><strong>방축천 횡단:</strong> 1생활권 서측(고운·아름·종촌동)과 동측(도담·어진동) 사이의 <strong>방축천</strong> 다리를 건널 때마다 횡단 횟수가 1회 증가합니다.</li>
         <li><strong>조작법:</strong> 인접 정류장을 차례로 클릭해 연결하며, 이미 선택한 정류장을 다시 클릭하면 그 지점까지 되돌아갑니다.</li>
       </ul>
       <button class="btn btn-primary" id="btn-close-guide" style="width: 100%; padding: 10px;">확인</button>
@@ -505,9 +513,9 @@ html_content = f"""<!DOCTYPE html>
     let currentStage = null;
     let userPath = [];
     let hintStep = 0;
-    let clearedStages = new Set(JSON.parse(localStorage.getItem("sejong_bus_cleared") || "[]"));
+    let clearedStages = new Set(JSON.parse(localStorage.getItem("sejong_1zone_bus_cleared") || "[]"));
 
-    const defaultViewBox = {{ x: 120, y: 40, w: 2560, h: 2320 }};
+    const defaultViewBox = {{ x: 60, y: 20, w: 2260, h: 1820 }};
     let viewBox = {{ ...defaultViewBox }};
     let isPanning = false;
     let panStart = {{ x: 0, y: 0 }};
@@ -995,7 +1003,7 @@ html_content = f"""<!DOCTYPE html>
       if (isAtEnd && matchesSolution) {{
         playSuccessChime();
         clearedStages.add(currentStage.id);
-        localStorage.setItem("sejong_bus_cleared", JSON.stringify([...clearedStages]));
+        localStorage.setItem("sejong_1zone_bus_cleared", JSON.stringify([...clearedStages]));
         document.getElementById("modal-route-display").textContent = userPath.join(" ➔ ");
         document.getElementById("victory-modal").classList.add("active");
       }} else if (manual) {{
