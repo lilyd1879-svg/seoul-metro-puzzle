@@ -634,6 +634,7 @@ html_content = f"""<!DOCTYPE html>
           <div class="od-station" id="od-end-name">여의도</div>
         </div>
       </div>
+      <button class="btn" id="btn-focus-od" style="width: 100%; padding: 8px 10px; font-size: 12px; border-color: rgba(6, 182, 212, 0.45); color: #67e8f9; flex: none;">🎯 출발·도착역 한 화면에 보기</button>
 
       <div class="clues-section">
         <div class="section-title">
@@ -702,6 +703,7 @@ html_content = f"""<!DOCTYPE html>
       <div class="map-controls">
         <button class="control-btn" id="btn-zoom-in" title="확대">+</button>
         <button class="control-btn" id="btn-zoom-out" title="축소">−</button>
+        <button class="control-btn" id="btn-focus-od-map" title="출발·도착역 한 화면에 보기">🎯</button>
         <button class="control-btn" id="btn-zoom-reset" title="전체 지도 보기">⛶</button>
         <button class="control-btn" id="btn-hint" title="다음 역 힌트">💡</button>
       </div>
@@ -1317,6 +1319,20 @@ html_content = f"""<!DOCTYPE html>
       viewBox = {{ ...defaultViewBox }};
       updateSvgViewBox();
     }});
+
+    function focusODStations() {{
+      if (!currentStage) return;
+      const s = GAME_DATA.stations[currentStage.start];
+      const e = GAME_DATA.stations[currentStage.end];
+      if (!s || !e) return;
+      const cx = (s.x + e.x) / 2;
+      const cy = (s.y + e.y) / 2;
+      const span = Math.min(3920, Math.max(460, Math.abs(s.x - e.x) * 1.65, Math.abs(s.y - e.y) * 1.65));
+      viewBox = {{ x: cx - span / 2, y: cy - span / 2, w: span, h: span }};
+      updateSvgViewBox();
+    }}
+    document.getElementById("btn-focus-od").addEventListener("click", focusODStations);
+    document.getElementById("btn-focus-od-map").addEventListener("click", focusODStations);
 
     document.getElementById("btn-undo").addEventListener("click", () => {{
       if (userPath.length > 1) {{
