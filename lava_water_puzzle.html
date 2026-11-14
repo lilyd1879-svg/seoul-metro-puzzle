@@ -922,8 +922,10 @@
           }
         }
 
-        const extra = difficulty === "easy" ? 2 : difficulty === "normal" ? 1 : 0;
-        const budget = Math.max(2, Math.ceil(minStones / 2) + extra);
+        const budget =
+          difficulty === "hard"
+            ? Math.max(2, Math.ceil(minStones / 3))
+            : Math.max(2, Math.ceil(minStones / 2) + (difficulty === "easy" ? 2 : 1));
 
         return {
           mode: "builder",
