@@ -469,14 +469,11 @@
           <div class="subtitle">용암과 물이 만나는 지점에 돌을 놓아 S에서 E까지 연결하세요</div>
         </div>
         <div class="header-controls">
-          <div class="mode-group" id="mode-group" role="group" aria-label="게임 모드 선택">
-            <button class="mode-btn active" type="button" data-mode="standard">기본 모드</button>
-            <button class="mode-btn" type="button" data-mode="builder">직접 설치</button>
-          </div>
           <div class="difficulty-group" id="difficulty-group" role="group" aria-label="난이도 선택">
             <button class="diff-btn" type="button" data-difficulty="easy">쉬움</button>
             <button class="diff-btn active" type="button" data-difficulty="normal">보통</button>
             <button class="diff-btn" type="button" data-difficulty="hard">어려움</button>
+            <button class="diff-btn" type="button" data-difficulty="extreme">최고 어려움</button>
           </div>
         </div>
       </div>
@@ -1009,7 +1006,6 @@
 
       // Browser UI controller
       if (typeof document !== "undefined") {
-        let currentMode = "standard";
         let currentDifficulty = "normal";
         let activeTool = "stone";
         let gameState = createPuzzle(currentDifficulty);
@@ -1020,7 +1016,6 @@
         const currentStonesEl = document.getElementById("current-stones");
         const minStonesEl = document.getElementById("min-stones");
         const messageBoxEl = document.getElementById("message-box");
-        const modeGroupEl = document.getElementById("mode-group");
         const difficultyGroupEl = document.getElementById("difficulty-group");
         const toolPaletteEl = document.getElementById("tool-palette");
         const lavaLeftEl = document.getElementById("lava-left");
@@ -1061,7 +1056,7 @@
           if (current === gameState.minStones) currentStonesEl.classList.add("match");
           else if (current > gameState.minStones) currentStonesEl.classList.add("over");
 
-          const isBuilder = currentMode === "builder";
+          const isBuilder = gameState.mode === "builder";
           toolPaletteEl.classList.toggle("show", isBuilder);
           if (isBuilder) {
             lavaLeftEl.textContent = String(gameState.lavaLeft);
@@ -1119,7 +1114,7 @@
           const r = Number(cellEl.dataset.row);
           const c = Number(cellEl.dataset.col);
 
-          if (currentMode === "builder") {
+          if (gameState.mode === "builder") {
             const res = applyBuilderTool(gameState, activeTool, r, c);
             if (!res.changed && res.reason) {
               messageBoxEl.className = "message-box show error";
@@ -1149,31 +1144,12 @@
 
         function loadNewRandomMap() {
           gameState =
-            currentMode === "builder"
-              ? createBuilderPuzzle(currentDifficulty)
+            currentDifficulty === "extreme"
+              ? createBuilderPuzzle("hard")
               : createPuzzle(currentDifficulty);
           clearMessage();
           renderBoard();
         }
-
-        modeGroupEl.addEventListener("click", (event) => {
-          const btn = event.target.closest(".mode-btn");
-          if (!btn) return;
-          const nextMode = btn.dataset.mode;
-          if (!nextMode || nextMode === currentMode) return;
-
-          currentMode = nextMode;
-          for (const el of modeGroupEl.querySelectorAll(".mode-btn")) {
-            el.classList.toggle("active", el === btn);
-          }
-          if (currentMode === "builder") {
-            activeTool = "stone";
-            for (const el of toolPaletteEl.querySelectorAll(".tool-btn")) {
-              el.classList.toggle("active", el.dataset.tool === "stone");
-            }
-          }
-          loadNewRandomMap();
-        });
 
         toolPaletteEl.addEventListener("click", (event) => {
           const btn = event.target.closest(".tool-btn");
@@ -1196,6 +1172,12 @@
           currentDifficulty = nextDiff;
           for (const el of difficultyGroupEl.querySelectorAll(".diff-btn")) {
             el.classList.toggle("active", el === btn);
+          }
+          if (currentDifficulty === "extreme") {
+            activeTool = "stone";
+            for (const el of toolPaletteEl.querySelectorAll(".tool-btn")) {
+              el.classList.toggle("active", el.dataset.tool === "stone");
+            }
           }
           loadNewRandomMap();
         });
