@@ -279,7 +279,7 @@ def collect_tier(difficulty, count, min_l, max_l, mode="any", preferred_starts=N
             continue
 
         d = dist_map[s].get(e, 999)
-        pair_max_l = min(max_l, d + (6 if mode == "hard_detour" else 4))
+        pair_max_l = min(max_l, d + (6 if mode in ("hard_detour", "master_hard") else 4))
         all_paths_ext, trunc = find_all_simple_paths(s, e, pair_max_l + 3, adj, cap=20000)
         if trunc:
             all_paths_N, trunc_N = find_all_simple_paths(s, e, pair_max_l, adj, cap=20000)
@@ -291,7 +291,7 @@ def collect_tier(difficulty, count, min_l, max_l, mode="any", preferred_starts=N
             continue
 
         cand_paths = [p for p in all_paths_ext if min_l <= len(p) <= pair_max_l]
-        if mode == "hard_detour":
+        if mode in ("hard_detour", "master_hard"):
             # Prefer longer detours and high transfer counts first
             cand_paths.sort(key=lambda p: -(len(p) - d))
             cand_paths = cand_paths[:20]
@@ -318,23 +318,31 @@ def collect_tier(difficulty, count, min_l, max_l, mode="any", preferred_starts=N
             elif mode == "require_special":
                 if not any(l in special_lines for l in line_seq):
                     continue
+            elif mode == "master_hard":
+                if not any(l in special_lines for l in line_seq) or p_transfers < 3:
+                    continue
             elif mode == "hard_detour":
                 if p_transfers < 3 and (p_len - 1) < d + 3:
                     continue
 
             sec_pool = [("transfer_count", p_transfers), ("river_crossings", p_rc)]
-            if len(line_seq) <= 5:
+            if mode != "master_hard" and len(line_seq) <= 5:
                 sec_pool.append(("line_sequence", line_seq))
             for l in line_seq:
                 if l in special_lines or l in {"신림선", "우이신설선", "공항철도", "신분당선", "인천1호선", "인천2호선"}:
                     sec_pool.append(("uses_line", l))
-            for st in path[1:-1]:
-                if len(STATIONS[st]["lines"]) > 1:
-                    sec_pool.append(("via_station", st))
+            if mode != "master_hard":
+                for st in path[1:-1]:
+                    if len(STATIONS[st]["lines"]) > 1:
+                        sec_pool.append(("via_station", st))
             for st in candidate_pool:
                 if st not in path and len(sec_pool) < 12:
                     if any(st in op for op in paths_N if op != path):
                         sec_pool.append(("avoid_station", st))
+            if mode == "master_hard":
+                for st in path[1:-1]:
+                    if len(STATIONS[st]["lines"]) > 1 and len(sec_pool) < 14:
+                        sec_pool.append(("via_station", st))
 
             found = False
             for k in [1, 2, 3]:
@@ -378,7 +386,7 @@ special_stations = [
 
 metro_stations = [n for n in candidate_pool if any(l in metro_only for l in STATIONS[n]["lines"])]
 
-master_stages = collect_tier("초고난이도", 50, 4, 8, mode="require_special", preferred_starts=list(set(special_stations)))
+master_stages = collect_tier("초고난이도", 50, 8, 13, mode="master_hard", preferred_starts=list(set(special_stations)))
 hard_detour = collect_tier("어려움", 25, 7, 12, mode="hard_detour", preferred_starts=hub_stations)
 hard_std = collect_tier("어려움", 25, 7, 10, mode="any")
 hard_stages = hard_detour + hard_std
