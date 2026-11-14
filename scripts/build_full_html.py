@@ -186,40 +186,44 @@ html_content = f"""<!DOCTYPE html>
       padding: 10px 16px;
       border-bottom: 1px solid var(--border-color);
       display: flex;
-      flex-wrap: wrap;
+      align-items: center;
       gap: 6px;
-      background: rgba(9, 13, 22, 0.6);
+      background: rgba(9, 13, 22, 0.75);
     }}
 
-    .stage-pill {{
-      padding: 4px 10px;
+    .stage-nav-btn {{
+      padding: 6px 10px;
       border-radius: 6px;
       border: 1px solid var(--border-color);
-      background: rgba(30, 41, 59, 0.6);
-      color: var(--text-muted);
-      font-size: 12px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }}
-
-    .stage-pill:hover {{
-      border-color: var(--accent-cyan);
+      background: rgba(30, 41, 59, 0.75);
       color: var(--text-main);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
     }}
 
-    .stage-pill.active {{
-      background: rgba(6, 182, 212, 0.2);
+    .stage-nav-btn:hover {{
       border-color: var(--accent-cyan);
       color: var(--accent-cyan);
     }}
 
-    .stage-pill.cleared {{
-      border-color: rgba(16, 185, 129, 0.6);
-      color: #34d399;
+    .stage-select {{
+      flex: 1;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 12.5px;
+      font-family: var(--font-main);
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+    }}
+
+    .stage-select:focus {{
+      border-color: var(--accent-cyan);
     }}
 
     .sidebar-header {{
@@ -606,7 +610,12 @@ html_content = f"""<!DOCTYPE html>
   <!-- Main Layout -->
   <div class="game-layout">
     <aside class="sidebar">
-      <div class="stage-selector-bar" id="stage-pills-container"></div>
+      <div class="stage-selector-bar">
+        <button class="stage-nav-btn" id="btn-prev-stage" title="이전 스테이지">◀</button>
+        <select class="stage-select" id="stage-select"></select>
+        <button class="stage-nav-btn" id="btn-next-stage-nav" title="다음 스테이지">▶</button>
+        <button class="stage-nav-btn" id="btn-random-stage" title="랜덤 문제">🎲</button>
+      </div>
 
       <div class="sidebar-header">
         <span class="stage-badge" id="sidebar-diff-badge">쉬움 · 스테이지 1</span>
@@ -745,7 +754,7 @@ html_content = f"""<!DOCTYPE html>
     const tracksLayer = document.getElementById("tracks-layer");
     const userPathLayer = document.getElementById("user-path-layer");
     const stationsLayer = document.getElementById("stations-layer");
-    const stagePillsContainer = document.getElementById("stage-pills-container");
+    const stageSelect = document.getElementById("stage-select");
     const clueListContainer = document.getElementById("clue-list-container");
     const routePreviewText = document.getElementById("route-preview-text");
     const tooltip = document.getElementById("station-tooltip");
@@ -897,19 +906,21 @@ html_content = f"""<!DOCTYPE html>
       currentStage = stages[index];
       userPath = [currentStage.start];
 
-      // Update Stage Pills
-      stagePillsContainer.innerHTML = '';
+      // Update Stage Select Dropdown
+      stageSelect.innerHTML = '';
+      let clearedInDiff = 0;
       stages.forEach((s, i) => {{
-        const pill = document.createElement("button");
         const isCleared = clearedStages.has(s.id);
-        pill.className = `stage-pill ${{i === index ? 'active' : ''}} ${{isCleared ? 'cleared' : ''}}`;
-        pill.innerHTML = `${{isCleared ? '✓ ' : ''}}${{i + 1}}`;
-        pill.addEventListener("click", () => loadStage(diff, i));
-        stagePillsContainer.appendChild(pill);
+        if (isCleared) clearedInDiff++;
+        const opt = document.createElement("option");
+        opt.value = i;
+        opt.textContent = `${{isCleared ? '✓ ' : ''}}#${{i + 1}} ${{s.start}} ➔ ${{s.end}} (${{s.path_length}}역)`;
+        if (i === index) opt.selected = true;
+        stageSelect.appendChild(opt);
       }});
 
       const badge = document.getElementById("sidebar-diff-badge");
-      badge.textContent = `${{currentStage.difficulty}} · 스테이지 ${{index + 1}}`;
+      badge.textContent = `${{currentStage.difficulty}} · 스테이지 ${{index + 1}} / ${{stages.length}} (클리어: ${{clearedInDiff}})`;
       badge.style.backgroundColor =
         diff === "쉬움" ? "rgba(16, 185, 129, 0.2)" :
         diff === "중간" ? "rgba(245, 158, 11, 0.2)" :
@@ -1284,6 +1295,26 @@ html_content = f"""<!DOCTYPE html>
         btn.classList.add("active");
         loadStage(btn.dataset.diff, 0);
       }});
+    }});
+
+    // Stage Navigator Listeners
+    stageSelect.addEventListener("change", (e) => {{
+      loadStage(currentDifficulty, parseInt(e.target.value, 10));
+    }});
+    document.getElementById("btn-prev-stage").addEventListener("click", () => {{
+      const stages = GAME_DATA.stages.filter(s => s.difficulty === currentDifficulty);
+      const prevIdx = (currentStageIndex - 1 + stages.length) % stages.length;
+      loadStage(currentDifficulty, prevIdx);
+    }});
+    document.getElementById("btn-next-stage-nav").addEventListener("click", () => {{
+      const stages = GAME_DATA.stages.filter(s => s.difficulty === currentDifficulty);
+      const nextIdx = (currentStageIndex + 1) % stages.length;
+      loadStage(currentDifficulty, nextIdx);
+    }});
+    document.getElementById("btn-random-stage").addEventListener("click", () => {{
+      const stages = GAME_DATA.stages.filter(s => s.difficulty === currentDifficulty);
+      const randIdx = Math.floor(Math.random() * stages.length);
+      loadStage(currentDifficulty, randIdx);
     }});
 
     // Official Map Modal Logic
