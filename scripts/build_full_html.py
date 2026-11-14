@@ -812,7 +812,7 @@ html_content = f"""<!DOCTYPE html>
       document.getElementById("legend-arrow").textContent = legendGrid.classList.contains("collapsed") ? "▶" : "▼";
     }});
 
-    // Render Tracks
+    // Render Tracks (with smooth curved arcs for express/skip-stop lines)
     function renderBaseTracks() {{
       tracksLayer.innerHTML = '';
       for (const [lineName, seq] of Object.entries(GAME_DATA.lines)) {{
@@ -822,17 +822,39 @@ html_content = f"""<!DOCTYPE html>
           const u = GAME_DATA.stations[seq[i]];
           const v = GAME_DATA.stations[seq[i+1]];
           if (u && v) {{
-            const lineEl = document.createElementNS("http://www.w3.org/2000/svg", "line");
-            lineEl.setAttribute("x1", u.x);
-            lineEl.setAttribute("y1", u.y);
-            lineEl.setAttribute("x2", v.x);
-            lineEl.setAttribute("y2", v.y);
-            lineEl.setAttribute("stroke", color);
-            lineEl.setAttribute("stroke-width", isSpecial ? "2.8" : "3.5");
-            lineEl.setAttribute("stroke-linecap", "round");
-            if (isSpecial) lineEl.setAttribute("stroke-dasharray", "6,5");
-            lineEl.setAttribute("opacity", isSpecial ? "0.7" : "0.52");
-            tracksLayer.appendChild(lineEl);
+            const dx = v.x - u.x, dy = v.y - u.y;
+            const dist = Math.hypot(dx, dy);
+            // Draw smooth Bezier curve if it's an express/special line or a long skip-stop hop
+            if (isSpecial || dist > 160) {{
+              const mx = (u.x + v.x) / 2;
+              const my = (u.y + v.y) / 2;
+              const offset = isSpecial ? Math.min(55, dist * 0.18) : Math.min(35, dist * 0.12);
+              const nx = -dy / (dist || 1);
+              const ny = dx / (dist || 1);
+              const cx = mx + nx * offset;
+              const cy = my + ny * offset;
+
+              const pathEl = document.createElementNS("http://www.w3.org/2000/svg", "path");
+              pathEl.setAttribute("d", `M ${{u.x}} ${{u.y}} Q ${{cx}} ${{cy}} ${{v.x}} ${{v.y}}`);
+              pathEl.setAttribute("fill", "none");
+              pathEl.setAttribute("stroke", color);
+              pathEl.setAttribute("stroke-width", isSpecial ? "2.8" : "3.5");
+              pathEl.setAttribute("stroke-linecap", "round");
+              if (isSpecial) pathEl.setAttribute("stroke-dasharray", "6,5");
+              pathEl.setAttribute("opacity", isSpecial ? "0.75" : "0.55");
+              tracksLayer.appendChild(pathEl);
+            }} else {{
+              const lineEl = document.createElementNS("http://www.w3.org/2000/svg", "line");
+              lineEl.setAttribute("x1", u.x);
+              lineEl.setAttribute("y1", u.y);
+              lineEl.setAttribute("x2", v.x);
+              lineEl.setAttribute("y2", v.y);
+              lineEl.setAttribute("stroke", color);
+              lineEl.setAttribute("stroke-width", "3.5");
+              lineEl.setAttribute("stroke-linecap", "round");
+              lineEl.setAttribute("opacity", "0.55");
+              tracksLayer.appendChild(lineEl);
+            }}
           }}
         }}
       }}
